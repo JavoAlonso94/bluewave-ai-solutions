@@ -14,15 +14,14 @@ export function ChatBot({ open, setOpen }: { open: boolean; setOpen: (v: boolean
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const sid = useRef("");
-  const end = useRef<HTMLDivElement>(null);
+  const box = useRef<HTMLDivElement>(null);
   useEffect(() => {
     sid.current = localStorage.getItem("iec-sid") || crypto.randomUUID();
     localStorage.setItem("iec-sid", sid.current);
   }, []);
-  useEffect(() => end.current?.scrollIntoView({ behavior: "smooth" }), [msgs, loading]);
+  useEffect(() => { const b = box.current; if (b) b.scrollTo({ top: b.scrollHeight, behavior: "smooth" }); }, [msgs, loading]);
 
-  const submit = async (e?: React.FormEvent) => {
-    e?.preventDefault();
+  const submit = async () => {
     const text = input.trim();
     if (!text || loading) return;
     setInput("");
@@ -63,7 +62,7 @@ export function ChatBot({ open, setOpen }: { open: boolean; setOpen: (v: boolean
                 <p className="text-xs opacity-80">En línea · responde al instante</p>
               </div>
             </div>
-            <div className="flex-1 space-y-3 overflow-y-auto p-4">
+            <div ref={box} className="flex-1 space-y-3 overflow-y-auto overscroll-contain p-4">
               {msgs.map((m, i) => (
                 <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                   className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${m.role === "user" ? "ml-auto bg-gradient-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}>
@@ -71,12 +70,11 @@ export function ChatBot({ open, setOpen }: { open: boolean; setOpen: (v: boolean
                 </motion.div>
               ))}
               {loading && <div className="w-16 rounded-2xl bg-secondary px-4 py-2 text-sm text-muted-foreground">•••</div>}
-              <div ref={end} />
             </div>
-            <form onSubmit={submit} className="flex gap-2 border-t p-3">
-              <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Escribe tu mensaje..."
+            <form action="#" onSubmit={(e) => { e.preventDefault(); e.stopPropagation(); void submit(); }} className="flex gap-2 border-t p-3">
+              <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); void submit(); } }} placeholder="Escribe tu mensaje..."
                 className="flex-1 rounded-full border bg-background/60 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-ring" />
-              <button aria-label="Enviar" className="grid h-10 w-10 place-items-center rounded-full bg-gradient-primary text-primary-foreground"><Send size={16} /></button>
+              <button type="button" onClick={() => void submit()} aria-label="Enviar" className="grid h-10 w-10 place-items-center rounded-full bg-gradient-primary text-primary-foreground"><Send size={16} /></button>
             </form>
           </motion.div>
         )}
