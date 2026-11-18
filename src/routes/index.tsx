@@ -1,23 +1,266 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import {
+  Server, MessageSquareText, Boxes, Users, LayoutTemplate, PhoneCall, MessageCircle,
+  Moon, Sun, Home, Layers, Workflow, Mail, ArrowRight, Sparkles, Zap, ShieldCheck, Clock,
+} from "lucide-react";
+import { ChatBot } from "@/components/site/ChatBot";
 
-// The home route ships no og:image, so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
+const Hero3D = lazy(() => import("@/components/site/Hero3D"));
+const ParticlesBg = lazy(() => import("@/components/site/ParticlesBg"));
+
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "IEC IA — Automatización con Inteligencia Artificial" },
+      { name: "description", content: "Servidores de IA, chatbots inteligentes, ERP, CRM, CMS, llamadas con IA y WhatsApp automatizado para tu empresa." },
+      { property: "og:title", content: "IEC IA — Automatización con Inteligencia Artificial" },
+      { property: "og:description", content: "Automatiza tu empresa con IA: chatbots, ERP, CRM, llamadas y WhatsApp." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
+const services = [
+  { icon: Server, title: "Servidores de IA", desc: "Infraestructura privada con modelos de IA propios, seguros y escalables." },
+  { icon: MessageSquareText, title: "Chatbots inteligentes", desc: "Asistentes que entienden, venden y atienden 24/7 en tu web." },
+  { icon: Boxes, title: "ERP a medida", desc: "Inventario, compras, finanzas y operación conectados con IA." },
+  { icon: Users, title: "CRM inteligente", desc: "Seguimiento automático de clientes, ventas y oportunidades." },
+  { icon: LayoutTemplate, title: "CMS avanzados", desc: "Gestiona tu contenido con flujos automáticos y generación con IA." },
+  { icon: PhoneCall, title: "Llamadas con IA", desc: "Agentes de voz que llaman, agendan y califican prospectos." },
+  { icon: MessageCircle, title: "IA en WhatsApp", desc: "Respuestas automáticas, ventas y soporte directo en WhatsApp." },
+  { icon: Workflow, title: "Flujos con n8n", desc: "Conectamos todas tus herramientas en procesos sin fricción." },
+];
+
+const steps = [
+  { n: "01", t: "Diagnóstico", d: "Analizamos tus procesos y detectamos qué automatizar." },
+  { n: "02", t: "Diseño", d: "Creamos la solución de IA adecuada para tu negocio." },
+  { n: "03", t: "Implementación", d: "Integramos todo con tus sistemas actuales." },
+  { n: "04", t: "Optimización", d: "Medimos resultados y mejoramos continuamente." },
+];
+
+const stats = [
+  { v: "70%", l: "menos tareas manuales" },
+  { v: "24/7", l: "atención automática" },
+  { v: "3x", l: "más respuesta a clientes" },
+  { v: "+50", l: "integraciones" },
+];
+
+const fade = {
+  initial: { opacity: 0, y: 40 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.2 },
+  transition: { duration: 0.7, ease: [0.2, 0.8, 0.2, 1] as const },
+};
+
 function Index() {
+  const [mounted, setMounted] = useState(false);
+  const [dark, setDark] = useState(true);
+  const [chat, setChat] = useState(false);
+  const [tab, setTab] = useState("inicio");
+
+  useEffect(() => {
+    setMounted(true);
+    setDark(document.documentElement.classList.contains("dark"));
+  }, []);
+  const toggle = () => {
+    const n = !dark;
+    setDark(n);
+    document.documentElement.classList.toggle("dark", n);
+    localStorage.setItem("iec-theme", n ? "dark" : "light");
+  };
+
+  const nav = [
+    { id: "inicio", label: "Inicio", icon: Home },
+    { id: "servicios", label: "Servicios", icon: Layers },
+    { id: "proceso", label: "Proceso", icon: Workflow },
+    { id: "contacto", label: "Contacto", icon: Mail },
+  ];
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="relative min-h-screen overflow-x-hidden pb-24 md:pb-0">
+      {/* Top bar: app header on mobile, navbar on desktop */}
+      <header className="glass fixed inset-x-0 top-0 z-40 md:inset-x-4 md:top-4 md:rounded-full">
+        <div className="container flex h-16 items-center justify-between px-4 md:px-6">
+          <a href="#inicio" className="flex items-center gap-2">
+            <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-primary font-display font-bold text-primary-foreground shadow-glow">IE</span>
+            <span className="font-display text-lg font-bold">IEC <span className="text-gradient">IA</span></span>
+          </a>
+          <nav className="hidden items-center gap-8 text-sm font-semibold md:flex">
+            {nav.map((n) => (
+              <a key={n.id} href={`#${n.id}`} className="text-muted-foreground transition-colors hover:text-foreground">{n.label}</a>
+            ))}
+          </nav>
+          <div className="flex items-center gap-2">
+            <button onClick={toggle} aria-label="Cambiar modo día/noche" className="grid h-10 w-10 place-items-center rounded-full border bg-background/40 transition-transform hover:rotate-12">
+              {dark ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+            <span className="hidden md:inline-flex"><a href="#contacto" className="btn-hero !px-5 !py-2 text-sm">Cotizar</a></span>
+          </div>
+        </div>
+      </header>
+
+      {/* HERO */}
+      <section id="inicio" className="relative flex min-h-[100svh] items-center pt-20">
+        <div className="absolute inset-0 -z-0">
+          {mounted && <Suspense fallback={null}><ParticlesBg dark={dark} /></Suspense>}
+        </div>
+        <div className="container relative">
+          <div className="row align-items-center g-5">
+            <div className="col-lg-6 text-center lg:text-left">
+              <motion.span {...fade} className="glass inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold">
+                <Sparkles size={14} className="text-primary" /> Automatización con Inteligencia Artificial
+              </motion.span>
+              <motion.h1 {...fade} transition={{ ...fade.transition, delay: 0.1 }}
+                className="mt-6 text-4xl font-extrabold leading-[1.05] md:text-6xl">
+                Tu empresa, <span className="text-gradient">automatizada</span> con IA que trabaja por ti
+              </motion.h1>
+              <motion.p {...fade} transition={{ ...fade.transition, delay: 0.2 }} className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground lg:mx-0">
+                Chatbots, agentes de voz, WhatsApp, ERP y CRM conectados en un solo ecosistema inteligente.
+              </motion.p>
+              <motion.div {...fade} transition={{ ...fade.transition, delay: 0.3 }} className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
+                <a href="#contacto" className="btn-hero">Agenda una demo <ArrowRight size={18} /></a>
+                <button onClick={() => setChat(true)} className="btn-ghost-glass">Habla con el bot</button>
+              </motion.div>
+            </div>
+            <div className="col-lg-6">
+              <div className="relative mx-auto aspect-square w-full max-w-[520px]">
+                <div className="absolute inset-10 rounded-full bg-gradient-primary opacity-30 blur-3xl" />
+                {mounted && <Suspense fallback={null}><Hero3D /></Suspense>}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Marquee */}
+      <div className="glass overflow-hidden border-x-0 py-4">
+        <div className="animate-marquee flex w-max gap-12 whitespace-nowrap font-display text-lg font-semibold text-muted-foreground">
+          {[...Array(2)].flatMap((_, k) =>
+            ["OpenAI", "n8n", "WhatsApp", "Odoo", "HubSpot", "Twilio", "Google Cloud", "Make", "Zapier", "Stripe"].map((b) => (
+              <span key={b + k} className="flex items-center gap-3"><Zap size={16} className="text-primary" />{b}</span>
+            )),
+          )}
+        </div>
+      </div>
+
+      {/* Stats */}
+      <section className="container py-16">
+        <div className="row g-3">
+          {stats.map((s, i) => (
+            <motion.div key={s.l} {...fade} transition={{ ...fade.transition, delay: i * 0.08 }} className="col-6 col-md-3">
+              <div className="glass rounded-3xl p-6 text-center">
+                <p className="font-display text-4xl font-extrabold text-gradient">{s.v}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{s.l}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Services */}
+      <section id="servicios" className="container scroll-mt-24 py-16">
+        <motion.div {...fade} className="mx-auto mb-12 max-w-2xl text-center">
+          <p className="text-sm font-bold uppercase tracking-widest text-primary">Servicios</p>
+          <h2 className="mt-3 text-3xl font-extrabold md:text-5xl">Soluciones de IA para <span className="text-gradient">cada área</span></h2>
+        </motion.div>
+        <div className="row g-4">
+          {services.map((s, i) => (
+            <motion.div key={s.title} {...fade} transition={{ ...fade.transition, delay: (i % 4) * 0.08 }} className="col-6 col-lg-3">
+              <div className="card-tilt glass group h-full rounded-3xl p-5 md:p-6">
+                <div className="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-gradient-primary text-primary-foreground shadow-glow transition-transform group-hover:scale-110 group-hover:rotate-6">
+                  <s.icon size={22} />
+                </div>
+                <h3 className="text-base font-bold md:text-lg">{s.title}</h3>
+                <p className="mt-2 hidden text-sm text-muted-foreground sm:block">{s.desc}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Why */}
+      <section className="container py-16">
+        <div className="glass relative overflow-hidden rounded-[2rem] p-8 md:p-14">
+          <div className="animate-float absolute -right-20 -top-20 h-72 w-72 rounded-full bg-gradient-primary opacity-30 blur-3xl" />
+          <div className="row g-5 align-items-center relative">
+            <motion.div {...fade} className="col-lg-5">
+              <h2 className="text-3xl font-extrabold md:text-4xl">¿Por qué <span className="text-gradient">IEC IA</span>?</h2>
+              <p className="mt-4 text-muted-foreground">Implementamos IA real que genera resultados medibles desde el primer mes.</p>
+            </motion.div>
+            <div className="col-lg-7">
+              <div className="row g-3">
+                {[{ i: Zap, t: "Implementación rápida", d: "Resultados en semanas, no meses." },
+                  { i: ShieldCheck, t: "Seguridad total", d: "Tus datos protegidos y privados." },
+                  { i: Clock, t: "Disponible 24/7", d: "Tu negocio nunca deja de responder." },
+                  { i: Workflow, t: "Todo integrado", d: "Conectamos tus sistemas actuales." }].map((f, k) => (
+                  <motion.div key={f.t} {...fade} transition={{ ...fade.transition, delay: k * 0.08 }} className="col-sm-6">
+                    <div className="flex gap-3 rounded-2xl bg-background/40 p-4">
+                      <f.i className="mt-1 shrink-0 text-primary" size={20} />
+                      <div><p className="font-bold">{f.t}</p><p className="text-sm text-muted-foreground">{f.d}</p></div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Process */}
+      <section id="proceso" className="container scroll-mt-24 py-16">
+        <motion.div {...fade} className="mb-12 text-center">
+          <p className="text-sm font-bold uppercase tracking-widest text-primary">Proceso</p>
+          <h2 className="mt-3 text-3xl font-extrabold md:text-5xl">Así <span className="text-gradient">trabajamos</span></h2>
+        </motion.div>
+        <div className="row g-4">
+          {steps.map((s, i) => (
+            <motion.div key={s.n} {...fade} transition={{ ...fade.transition, delay: i * 0.1 }} className="col-md-6 col-lg-3">
+              <div className="card-tilt glass h-full rounded-3xl p-6">
+                <p className="font-display text-5xl font-extrabold text-gradient">{s.n}</p>
+                <h3 className="mt-3 text-xl font-bold">{s.t}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{s.d}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA / Contact */}
+      <section id="contacto" className="container scroll-mt-24 py-16">
+        <motion.div {...fade} className="relative overflow-hidden rounded-[2rem] bg-gradient-primary p-10 text-center text-primary-foreground shadow-glow md:p-16">
+          <h2 className="text-3xl font-extrabold md:text-5xl">¿Listo para automatizar tu empresa?</h2>
+          <p className="mx-auto mt-4 max-w-xl opacity-90">Cuéntanos tu proyecto y nuestro asistente te guiará al instante.</p>
+          <button onClick={() => setChat(true)} className="mt-8 inline-flex items-center gap-2 rounded-full bg-background px-7 py-3 font-bold text-foreground transition-transform hover:scale-105">
+            Iniciar conversación <ArrowRight size={18} />
+          </button>
+        </motion.div>
+      </section>
+
+      <footer className="container py-10 text-center text-sm text-muted-foreground">
+        © {new Date().getFullYear()} IEC IA · Automatización con Inteligencia Artificial
+      </footer>
+
+      <ChatBot open={chat} setOpen={setChat} />
+
+      {/* Mobile native-style tab bar */}
+      <nav className="glass pb-safe fixed inset-x-3 bottom-3 z-40 flex justify-around rounded-3xl pt-2 md:hidden">
+        {nav.map((n) => {
+          const active = tab === n.id;
+          return (
+            <a key={n.id} href={`#${n.id}`} onClick={() => setTab(n.id)}
+              className={`flex flex-1 flex-col items-center gap-1 py-1 text-[11px] font-semibold transition-colors ${active ? "text-primary" : "text-muted-foreground"}`}>
+              <motion.span animate={{ scale: active ? 1.15 : 1 }} className={`grid h-8 w-12 place-items-center rounded-full ${active ? "bg-primary/15" : ""}`}>
+                <n.icon size={20} />
+              </motion.span>
+              {n.label}
+            </a>
+          );
+        })}
+      </nav>
     </div>
   );
 }
