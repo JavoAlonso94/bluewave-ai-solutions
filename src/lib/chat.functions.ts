@@ -22,7 +22,7 @@ export const sendChatMessage = createServerFn({ method: "POST" })
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, source: "web", timestamp: new Date().toISOString() }),
+        body: JSON.stringify({ action: "sendMessage", sessionId: data.sessionId, chatInput: data.message, message: data.message, source: "web" }),
       });
       const text = await res.text();
       if (!res.ok) {
