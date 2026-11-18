@@ -10,7 +10,7 @@ export const sendChatMessage = createServerFn({ method: "POST" })
     return { message, sessionId };
   })
   .handler(async ({ data }) => {
-    const url = process.env.N8N_WEBHOOK_URL;
+    const url = process.env["N8N_WEBHOOK_URL"];
     if (!url) {
       return {
         reply:
