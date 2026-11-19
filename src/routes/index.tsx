@@ -8,6 +8,8 @@ import {
 import { ChatBot } from "@/components/site/ChatBot";
 import { motion as m2, useScroll, useSpring, AnimatePresence } from "framer-motion";
 import { ChevronDown, Star, CheckCircle2 } from "lucide-react";
+import logoLight from "@/assets/iec-logo-light.png.asset.json";
+import logoDark from "@/assets/iec-logo-dark.png.asset.json";
 import teamImg from "@/assets/team-ai.jpg";
 import serversImg from "@/assets/ai-servers.jpg";
 import waImg from "@/assets/whatsapp-ai.jpg";
@@ -102,8 +104,8 @@ const stats = [
 ];
 
 const fade = {
-  initial: { opacity: 0, y: 40 },
-  whileInView: { opacity: 1, y: 0 },
+  initial: { opacity: 0, y: 40, filter: "blur(12px)" },
+  whileInView: { opacity: 1, y: 0, filter: "blur(0px)" },
   viewport: { once: true, amount: 0.2 },
   transition: { duration: 0.7, ease: [0.2, 0.8, 0.2, 1] as const },
 };
@@ -138,7 +140,7 @@ function Index() {
       <header className="glass fixed inset-x-0 top-0 z-40 md:inset-x-4 md:top-4 md:rounded-full">
         <div className="container flex h-16 items-center justify-between px-4 md:px-6">
           <a href="#inicio" className="flex items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-primary font-display font-bold text-primary-foreground shadow-glow">IE</span>
+            <img src={logoLight.url} alt="IEC IA" width={44} height={34} className="h-11 w-auto dark:hidden" /><img src={logoDark.url} alt="IEC IA" width={44} height={34} className="hidden h-11 w-auto dark:block" />
             <span className="font-display text-lg font-bold">IEC <span className="text-gradient">IA</span></span>
           </a>
           <nav className="hidden items-center gap-8 text-sm font-semibold md:flex">
@@ -380,6 +382,8 @@ function Index() {
       </footer>
 
       <ScrollBar />
+      <div className="blur-orb left-[-10%] top-[30%] h-96 w-96" />
+      <div className="blur-orb right-[-10%] top-[70%] h-[28rem] w-[28rem]" style={{ animationDelay: "-7s" }} />
       <ChatBot open={chat} setOpen={setChat} />
 
       {/* Mobile native-style tab bar */}
