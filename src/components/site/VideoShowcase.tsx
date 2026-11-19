@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowDown, CheckCheck, MessageCircle, Pause, Play, Sparkles } from "lucide-react";
+import { ArrowDown, CheckCheck, MessageCircle, Pause, Play, Sparkles, Volume2, VolumeX } from "lucide-react";
 
 const chapters = [
   {
@@ -23,6 +23,7 @@ export function VideoShowcase({ src, poster }: { src: string; poster?: string })
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -64,6 +65,7 @@ export function VideoShowcase({ src, poster }: { src: string; poster?: string })
           const outro = section.querySelector<HTMLElement>(".cinema-outro");
           gsap.set(captions, { autoAlpha: 0, y: 24 });
           gsap.set(outro, { autoAlpha: 0, y: 20 });
+          gsap.set(".video-chrome", { autoAlpha: 0 });
 
           const timeline = gsap.timeline({
             defaults: { ease: "none" },
@@ -89,7 +91,14 @@ export function VideoShowcase({ src, poster }: { src: string; poster?: string })
               { scale: 1, borderRadius: "0.75rem", duration: 0.3 },
               0,
             )
-            .to(".cinema-intro", { autoAlpha: 0, y: -48, duration: 0.16 }, 0.03);
+            .fromTo(
+              ".demo-video",
+              { filter: "blur(8px) brightness(0.25)", scale: 1.06 },
+              { filter: "blur(0px) brightness(1)", scale: 1, duration: 0.24 },
+              0,
+            )
+            .to(".cinema-intro", { autoAlpha: 0, y: -48, duration: 0.16 }, 0.03)
+            .to(".video-chrome", { autoAlpha: 1, duration: 0.08 }, 0.18);
 
           captions.forEach((caption, index) => {
             const start = 0.28 + index * 0.22;
@@ -128,7 +137,11 @@ export function VideoShowcase({ src, poster }: { src: string; poster?: string })
     if (!video) return;
     if (video.paused) {
       if (video.ended || video.currentTime >= video.duration - 0.1) video.currentTime = 0;
-      await video.play();
+      try {
+        await video.play();
+      } catch {
+        video.controls = true;
+      }
     } else {
       video.pause();
     }
@@ -139,7 +152,7 @@ export function VideoShowcase({ src, poster }: { src: string; poster?: string })
       ref={sectionRef}
       id="demo"
       aria-labelledby="demo-title"
-      className={`video-cinema relative isolate overflow-clip ${reducedMotion ? "py-20" : "h-[340svh]"}`}
+      className={`video-cinema relative isolate scroll-mt-24 overflow-clip ${reducedMotion ? "py-20" : "h-[340svh]"}`}
     >
       <div
         className={
@@ -187,27 +200,40 @@ export function VideoShowcase({ src, poster }: { src: string; poster?: string })
               ref={videoRef}
               src={src}
               poster={poster}
-              muted
+              muted={muted}
               playsInline
               preload="auto"
               controls={reducedMotion}
               aria-label="Demostración de un chatbot de ventas para BatorGYM atendiendo por WhatsApp"
-              className="h-full w-full object-cover"
+              className="demo-video h-full w-full object-cover"
             />
             <div className="cinema-vignette pointer-events-none absolute inset-0" />
-            <div className="cinema-chip absolute left-3 top-3 flex items-center gap-2 rounded-full px-3 py-2 text-[11px] font-bold md:left-5 md:top-5 md:text-xs">
+            <div className="video-chrome cinema-chip absolute left-3 top-3 flex items-center gap-2 rounded-full px-3 py-2 text-[11px] font-bold md:left-5 md:top-5 md:text-xs">
               <MessageCircle size={15} /> BatorGYM · WhatsApp
               <CheckCheck size={15} className="text-primary-glow" />
             </div>
-            <button
-              type="button"
-              onClick={() => void togglePlayback()}
-              className="cinema-control absolute bottom-3 right-3 inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-bold md:bottom-5 md:right-5 md:px-4"
-              aria-label={playing ? "Pausar video" : "Reproducir video"}
-            >
-              {playing ? <Pause size={15} fill="currentColor" /> : <Play size={15} fill="currentColor" />}
-              <span className="hidden sm:inline">{playing ? "Pausar" : "Reproducir"}</span>
-            </button>
+            {!reducedMotion && (
+              <div className="video-chrome absolute bottom-3 right-3 flex items-center gap-2 md:bottom-5 md:right-5">
+              <button
+                type="button"
+                onClick={() => setMuted((value) => !value)}
+                className="cinema-control inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-bold"
+                aria-label={muted ? "Activar sonido" : "Silenciar video"}
+              >
+                {muted ? <VolumeX size={15} /> : <Volume2 size={15} />}
+                <span className="hidden lg:inline">{muted ? "Sin sonido" : "Sonido"}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => void togglePlayback()}
+                className="cinema-control inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-bold md:px-4"
+                aria-label={playing ? "Pausar video" : "Reproducir video"}
+              >
+                {playing ? <Pause size={15} fill="currentColor" /> : <Play size={15} fill="currentColor" />}
+                <span className="hidden sm:inline">{playing ? "Pausar" : "Reproducir"}</span>
+              </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -216,14 +242,14 @@ export function VideoShowcase({ src, poster }: { src: string; poster?: string })
             {chapters.map((chapter) => (
               <div
                 key={chapter.step}
-                className="story-caption cinema-caption absolute inset-x-4 bottom-7 z-20 mx-auto max-w-lg rounded-3xl p-5 opacity-0 md:inset-x-auto md:bottom-10 md:left-10 md:mx-0 md:p-6"
+                className="story-caption cinema-caption absolute inset-x-4 bottom-40 z-20 mx-auto max-w-lg rounded-3xl p-4 opacity-0 md:inset-x-auto md:bottom-10 md:left-10 md:mx-0 md:p-6"
               >
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-glow">{chapter.step} · Automatización</p>
                 <h3 className="mt-2 text-xl font-bold md:text-2xl">{chapter.title}</h3>
                 <p className="mt-2 text-sm text-cinema-muted">{chapter.text}</p>
               </div>
             ))}
-            <div className="cinema-outro pointer-events-none absolute inset-x-4 bottom-8 z-20 mx-auto max-w-xl text-center opacity-0">
+            <div className="cinema-outro pointer-events-none absolute inset-x-4 bottom-40 z-20 mx-auto max-w-xl text-center opacity-0 md:bottom-8">
               <p className="font-display text-2xl font-bold md:text-4xl">Vende más. Responde siempre.</p>
               <p className="mt-2 text-sm text-cinema-muted md:text-base">Una demo de BatorGYM creada para IEC IA.</p>
             </div>

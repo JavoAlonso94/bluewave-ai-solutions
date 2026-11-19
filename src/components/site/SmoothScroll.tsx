@@ -3,7 +3,8 @@ import { useEffect } from "react";
 export default function SmoothScroll() {
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (reducedMotion.matches) return;
+    const desktop = window.matchMedia("(min-width: 768px)");
+    if (reducedMotion.matches || !desktop.matches) return;
 
     let cancelled = false;
     let frame = 0;
@@ -13,6 +14,7 @@ export default function SmoothScroll() {
       if (cancelled) return;
 
       const lenis = new Lenis({
+        anchors: { offset: -80 },
         autoRaf: false,
         duration: 1.05,
         smoothWheel: true,

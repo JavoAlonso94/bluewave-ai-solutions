@@ -3,9 +3,10 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Server, MessageSquareText, Boxes, Users, LayoutTemplate, PhoneCall, MessageCircle,
-  Moon, Sun, Home, Layers, Workflow, Mail, ArrowRight, Sparkles, Zap, ShieldCheck, Clock,
+  Moon, Sun, Home, Layers, Workflow, Mail, ArrowRight, Sparkles, Zap, ShieldCheck, Clock, CirclePlay,
 } from "lucide-react";
 import { ChatBot } from "@/components/site/ChatBot";
+import { VideoShowcase } from "@/components/site/VideoShowcase";
 import { motion as m2, useScroll, useSpring, AnimatePresence } from "framer-motion";
 import { ChevronDown, Star, CheckCircle2 } from "lucide-react";
 import logoLight from "@/assets/iec-logo-light.png.asset.json";
@@ -14,6 +15,8 @@ import teamImg from "@/assets/team-ai.jpg";
 import serversImg from "@/assets/ai-servers.jpg";
 import waImg from "@/assets/whatsapp-ai.jpg";
 import voiceImg from "@/assets/voice-ai.jpg";
+import gymVideo from "@/assets/videos/batorgym-chatbot-whatsapp.mp4.asset.json";
+import gymPoster from "@/assets/videos/batorgym-chatbot-poster.jpg.asset.json";
 
 const showcase = [
   { img: serversImg, tag: "Infraestructura", t: "Servidores de IA privados", d: "Modelos propios en tu nube, con datos 100% bajo tu control." },
@@ -131,6 +134,7 @@ function Index() {
   const nav = [
     { id: "inicio", label: "Inicio", icon: Home },
     { id: "servicios", label: "Servicios", icon: Layers },
+    { id: "demo", label: "Demo", icon: CirclePlay },
     { id: "proceso", label: "Proceso", icon: Workflow },
     { id: "contacto", label: "Contacto", icon: Mail },
   ];
@@ -236,6 +240,9 @@ function Index() {
           ))}
         </div>
       </section>
+
+      {/* Cinematic video demo */}
+      <VideoShowcase src={gymVideo.url} poster={gymPoster.url} />
 
       {/* Showcase */}
       <section className="container py-16">
