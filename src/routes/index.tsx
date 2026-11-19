@@ -2,11 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
-  Server, MessageSquareText, Boxes, Users, LayoutTemplate, PhoneCall, MessageCircle,
-  Moon, Sun, Home, Layers, Workflow, Mail, ArrowRight, Sparkles, Zap, ShieldCheck, Clock, CirclePlay,
+  PhoneCall, Moon, Sun, Home, Layers, Workflow, Mail, ArrowRight, Sparkles,
+  Zap, ShieldCheck, Clock, CirclePlay,
 } from "lucide-react";
 import { ChatBot } from "@/components/site/ChatBot";
 import { VideoShowcase } from "@/components/site/VideoShowcase";
+import { CallCenterShowcase } from "@/components/site/CallCenterShowcase";
+import { N8NFlowBuilder } from "@/components/site/N8NFlowBuilder";
+import { ServiceExplorer } from "@/components/site/ServiceExplorer";
+import { ProcessJourney } from "@/components/site/ProcessJourney";
 import { motion as m2, useScroll, useSpring, AnimatePresence } from "framer-motion";
 import { ChevronDown, Star, CheckCircle2 } from "lucide-react";
 import logoLight from "@/assets/iec-logo-light.png.asset.json";
@@ -72,33 +76,15 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "IEC IA — Automatización con Inteligencia Artificial" },
-      { name: "description", content: "Servidores de IA, chatbots inteligentes, ERP, CRM, CMS, llamadas con IA y WhatsApp automatizado para tu empresa." },
+      { name: "description", content: "Call center con IA, chatbots, flujos avanzados con n8n, ERP, CRM y WhatsApp automatizado para tu empresa." },
       { property: "og:title", content: "IEC IA — Automatización con Inteligencia Artificial" },
-      { property: "og:description", content: "Automatiza tu empresa con IA: chatbots, ERP, CRM, llamadas y WhatsApp." },
+      { property: "og:description", content: "Explora agentes de voz, chatbots y flujos n8n que conectan toda tu empresa." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Index,
 });
-
-const services = [
-  { icon: Server, title: "Servidores de IA", desc: "Infraestructura privada con modelos de IA propios, seguros y escalables." },
-  { icon: MessageSquareText, title: "Chatbots inteligentes", desc: "Asistentes que entienden, venden y atienden 24/7 en tu web." },
-  { icon: Boxes, title: "ERP a medida", desc: "Inventario, compras, finanzas y operación conectados con IA." },
-  { icon: Users, title: "CRM inteligente", desc: "Seguimiento automático de clientes, ventas y oportunidades." },
-  { icon: LayoutTemplate, title: "CMS avanzados", desc: "Gestiona tu contenido con flujos automáticos y generación con IA." },
-  { icon: PhoneCall, title: "Llamadas con IA", desc: "Agentes de voz que llaman, agendan y califican prospectos." },
-  { icon: MessageCircle, title: "IA en WhatsApp", desc: "Respuestas automáticas, ventas y soporte directo en WhatsApp." },
-  { icon: Workflow, title: "Flujos con n8n", desc: "Conectamos todas tus herramientas en procesos sin fricción." },
-];
-
-const steps = [
-  { n: "01", t: "Diagnóstico", d: "Analizamos tus procesos y detectamos qué automatizar." },
-  { n: "02", t: "Diseño", d: "Creamos la solución de IA adecuada para tu negocio." },
-  { n: "03", t: "Implementación", d: "Integramos todo con tus sistemas actuales." },
-  { n: "04", t: "Optimización", d: "Medimos resultados y mejoramos continuamente." },
-];
 
 const stats = [
   { v: "70%", l: "menos tareas manuales" },
@@ -114,6 +100,24 @@ const fade = {
   transition: { duration: 0.7, ease: [0.2, 0.8, 0.2, 1] as const },
 };
 
+const desktopNav = [
+  { id: "inicio", label: "Inicio", icon: Home },
+  { id: "servicios", label: "Servicios", icon: Layers },
+  { id: "callcenter", label: "Call center", icon: PhoneCall },
+  { id: "flujos", label: "Flujos n8n", icon: Workflow },
+  { id: "demo", label: "Demo", icon: CirclePlay },
+  { id: "proceso", label: "Proceso", icon: Zap },
+  { id: "contacto", label: "Contacto", icon: Mail },
+];
+
+const mobileNav = [
+  { id: "inicio", label: "Inicio", icon: Home },
+  { id: "servicios", label: "Servicios", icon: Layers },
+  { id: "callcenter", label: "Llamadas", icon: PhoneCall },
+  { id: "flujos", label: "Flujos", icon: Workflow },
+  { id: "contacto", label: "Contacto", icon: Mail },
+];
+
 function Index() {
   const [mounted, setMounted] = useState(false);
   const [dark, setDark] = useState(true);
@@ -124,6 +128,29 @@ function Index() {
     setMounted(true);
     setDark(document.documentElement.classList.contains("dark"));
   }, []);
+
+  useEffect(() => {
+    let frame = 0;
+    const updateActiveSection = () => {
+      frame = 0;
+      let current = "inicio";
+      desktopNav.forEach(({ id }) => {
+        const section = document.getElementById(id);
+        if (section && section.getBoundingClientRect().top <= Math.min(320, window.innerHeight * 0.35)) current = id;
+      });
+      setTab(current);
+    };
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(updateActiveSection);
+    };
+    updateActiveSection();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
   const toggle = () => {
     const n = !dark;
     setDark(n);
@@ -131,16 +158,11 @@ function Index() {
     localStorage.setItem("iec-theme", n ? "dark" : "light");
   };
 
-  const nav = [
-    { id: "inicio", label: "Inicio", icon: Home },
-    { id: "servicios", label: "Servicios", icon: Layers },
-    { id: "demo", label: "Demo", icon: CirclePlay },
-    { id: "proceso", label: "Proceso", icon: Workflow },
-    { id: "contacto", label: "Contacto", icon: Mail },
-  ];
+  const mobileActiveTab = tab === "demo" ? "servicios" : tab === "proceso" ? "flujos" : tab;
 
   return (
-    <div className="relative min-h-screen overflow-x-clip pb-24 md:pb-0">
+    <div className="relative min-h-screen overflow-x-clip pb-24 lg:pb-0">
+      <a href="#servicios" className="skip-link">Saltar a las soluciones</a>
       {/* Top bar: app header on mobile, navbar on desktop */}
       <header className="glass fixed inset-x-0 top-0 z-40 md:inset-x-4 md:top-4 md:rounded-full">
         <div className="container flex h-16 items-center justify-between px-4 md:px-6">
@@ -148,9 +170,17 @@ function Index() {
             <img src={logoLight.url} alt="IEC IA" width={44} height={34} className="h-11 w-auto dark:hidden" /><img src={logoDark.url} alt="IEC IA" width={44} height={34} className="hidden h-11 w-auto dark:block" />
             <span className="font-display text-lg font-bold">IEC <span className="text-gradient">IA</span></span>
           </a>
-          <nav className="hidden items-center gap-8 text-sm font-semibold md:flex">
-            {nav.map((n) => (
-              <a key={n.id} href={`#${n.id}`} className="text-muted-foreground transition-colors hover:text-foreground">{n.label}</a>
+          <nav className="hidden items-center gap-5 text-xs font-semibold lg:flex xl:gap-7 xl:text-sm" aria-label="Navegación principal">
+            {desktopNav.map((n) => (
+              <a
+                key={n.id}
+                href={`#${n.id}`}
+                aria-current={tab === n.id ? "location" : undefined}
+                className={`relative py-2 transition-colors hover:text-foreground ${tab === n.id ? "text-primary" : "text-muted-foreground"}`}
+              >
+                {n.label}
+                {tab === n.id && <motion.span layoutId="desktop-active-nav" className="absolute inset-x-0 -bottom-0.5 mx-auto h-0.5 rounded-full bg-gradient-primary" />}
+              </a>
             ))}
           </nav>
           <div className="flex items-center gap-2">
@@ -220,26 +250,9 @@ function Index() {
         </div>
       </section>
 
-      {/* Services */}
-      <section id="servicios" className="container scroll-mt-24 py-16">
-        <motion.div {...fade} className="mx-auto mb-12 max-w-2xl text-center">
-          <p className="text-sm font-bold uppercase tracking-widest text-primary">Servicios</p>
-          <h2 className="mt-3 text-3xl font-extrabold md:text-5xl">Soluciones de IA para <span className="text-gradient">cada área</span></h2>
-        </motion.div>
-        <div className="row g-4">
-          {services.map((s, i) => (
-            <motion.div key={s.title} {...fade} transition={{ ...fade.transition, delay: (i % 4) * 0.08 }} className="col-6 col-lg-3">
-              <div className="card-tilt glass group h-full rounded-3xl p-5 md:p-6">
-                <div className="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-gradient-primary text-primary-foreground shadow-glow transition-transform group-hover:scale-110 group-hover:rotate-6">
-                  <s.icon size={22} />
-                </div>
-                <h3 className="text-base font-bold md:text-lg">{s.title}</h3>
-                <p className="mt-2 hidden text-sm text-muted-foreground sm:block">{s.desc}</p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
+      <ServiceExplorer />
+      <CallCenterShowcase />
+      <N8NFlowBuilder />
 
       {/* Cinematic video demo */}
       <VideoShowcase src={gymVideo.url} poster={gymPoster.url} />
@@ -324,24 +337,7 @@ function Index() {
         </div>
       </section>
 
-      {/* Process */}
-      <section id="proceso" className="container scroll-mt-24 py-16">
-        <motion.div {...fade} className="mb-12 text-center">
-          <p className="text-sm font-bold uppercase tracking-widest text-primary">Proceso</p>
-          <h2 className="mt-3 text-3xl font-extrabold md:text-5xl">Así <span className="text-gradient">trabajamos</span></h2>
-        </motion.div>
-        <div className="row g-4">
-          {steps.map((s, i) => (
-            <motion.div key={s.n} {...fade} transition={{ ...fade.transition, delay: i * 0.1 }} className="col-md-6 col-lg-3">
-              <div className="card-tilt glass h-full rounded-3xl p-6">
-                <p className="font-display text-5xl font-extrabold text-gradient">{s.n}</p>
-                <h3 className="mt-3 text-xl font-bold">{s.t}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{s.d}</p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
+      <ProcessJourney />
 
       {/* Testimonials */}
       <section className="container py-16">
@@ -396,9 +392,9 @@ function Index() {
       <ChatBot open={chat} setOpen={setChat} />
 
       {/* Mobile native-style tab bar */}
-      <nav className="glass pb-safe fixed inset-x-3 bottom-3 z-40 flex justify-around rounded-3xl pt-2 md:hidden">
-        {nav.map((n) => {
-          const active = tab === n.id;
+      <nav className="glass pb-safe fixed inset-x-3 bottom-3 z-40 flex justify-around rounded-3xl pt-2 lg:hidden" aria-label="Navegación móvil">
+        {mobileNav.map((n) => {
+          const active = mobileActiveTab === n.id;
           return (
             <a key={n.id} href={`#${n.id}`} onClick={() => setTab(n.id)}
               className={`flex flex-1 flex-col items-center gap-1 py-1 text-[11px] font-semibold transition-colors ${active ? "text-primary" : "text-muted-foreground"}`}>
