@@ -6,6 +6,58 @@ import {
   Moon, Sun, Home, Layers, Workflow, Mail, ArrowRight, Sparkles, Zap, ShieldCheck, Clock,
 } from "lucide-react";
 import { ChatBot } from "@/components/site/ChatBot";
+import { motion as m2, useScroll, useSpring, AnimatePresence } from "framer-motion";
+import { ChevronDown, Star, CheckCircle2 } from "lucide-react";
+import teamImg from "@/assets/team-ai.jpg";
+import serversImg from "@/assets/ai-servers.jpg";
+import waImg from "@/assets/whatsapp-ai.jpg";
+import voiceImg from "@/assets/voice-ai.jpg";
+
+const showcase = [
+  { img: serversImg, tag: "Infraestructura", t: "Servidores de IA privados", d: "Modelos propios en tu nube, con datos 100% bajo tu control." },
+  { img: waImg, tag: "WhatsApp", t: "Ventas y soporte en WhatsApp", d: "Tu asistente responde, cotiza y cierra ventas en segundos." },
+  { img: voiceImg, tag: "Voz", t: "Agentes de llamadas con IA", d: "Llamadas entrantes y salientes con voz natural, 24/7." },
+];
+const testimonials = [
+  { n: "Laura Méndez", r: "Directora, Grupo Altamar", q: "Redujimos 65% el tiempo de atención. El bot de WhatsApp vende solo." },
+  { n: "Carlos Ruiz", r: "CEO, LogiMex", q: "El ERP con IA nos dio visibilidad total del inventario en tiempo real." },
+  { n: "Andrea Torres", r: "Gerente comercial, Novacasa", q: "Las llamadas con IA califican prospectos mejor que nuestro equipo anterior." },
+];
+const faqs = [
+  { q: "¿Cuánto tarda una implementación?", a: "La mayoría de los proyectos están listos entre 2 y 6 semanas, según su alcance." },
+  { q: "¿Se integra con mis sistemas actuales?", a: "Sí. Conectamos ERP, CRM, WhatsApp, correo y más de 50 herramientas mediante n8n y APIs." },
+  { q: "¿Mis datos están seguros?", a: "Usamos servidores privados y cifrado; tus datos nunca se usan para entrenar modelos externos." },
+  { q: "¿Necesito conocimientos técnicos?", a: "No. Nosotros diseñamos, implementamos y capacitamos a tu equipo." },
+];
+
+function ScrollBar() {
+  const { scrollYProgress } = useScroll();
+  const x = useSpring(scrollYProgress, { stiffness: 120, damping: 30 });
+  return <m2.div style={{ scaleX: x }} className="fixed inset-x-0 top-0 z-[60] h-1 origin-left bg-gradient-primary" />;
+}
+
+function Faq() {
+  const [o, setO] = useState<number | null>(0);
+  return (
+    <div className="mx-auto max-w-3xl space-y-3">
+      {faqs.map((f, i) => (
+        <div key={f.q} className="glass overflow-hidden rounded-2xl">
+          <button type="button" onClick={() => setO(o === i ? null : i)} className="flex w-full items-center justify-between gap-4 p-5 text-left font-bold">
+            {f.q}
+            <ChevronDown className={`shrink-0 text-primary transition-transform ${o === i ? "rotate-180" : ""}`} size={20} />
+          </button>
+          <AnimatePresence initial={false}>
+            {o === i && (
+              <m2.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+                <p className="px-5 pb-5 text-sm text-muted-foreground">{f.a}</p>
+              </m2.div>
+            )}
+          </AnimatePresence>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 const Hero3D = lazy(() => import("@/components/site/Hero3D"));
 const ParticlesBg = lazy(() => import("@/components/site/ParticlesBg"));
@@ -182,6 +234,58 @@ function Index() {
         </div>
       </section>
 
+      {/* Showcase */}
+      <section className="container py-16">
+        <motion.div {...fade} className="mx-auto mb-12 max-w-2xl text-center">
+          <p className="text-sm font-bold uppercase tracking-widest text-primary">Casos reales</p>
+          <h2 className="mt-3 text-3xl font-extrabold md:text-5xl">IA que <span className="text-gradient">trabaja por ti</span></h2>
+        </motion.div>
+        <div className="row g-4">
+          {showcase.map((c, i) => (
+            <motion.div key={c.t} {...fade} transition={{ ...fade.transition, delay: i * 0.1 }} className="col-md-4">
+              <div className="group glass relative h-full overflow-hidden rounded-3xl">
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <img src={c.img} alt={c.t} loading="lazy" width={1024} height={768} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+                  <span className="glass absolute left-4 top-4 rounded-full px-3 py-1 text-xs font-bold text-primary">{c.tag}</span>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold">{c.t}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">{c.d}</p>
+                  <a href="#contacto" className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-primary transition-all group-hover:gap-2">Ver más <ArrowRight size={16} /></a>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Team */}
+      <section className="container py-16">
+        <div className="row g-5 align-items-center">
+          <motion.div {...fade} className="col-lg-6">
+            <div className="relative">
+              <div className="absolute -inset-3 rounded-[2rem] bg-gradient-primary opacity-40 blur-2xl" />
+              <img src={teamImg} alt="Equipo de IEC IA trabajando con paneles de IA" loading="lazy" width={1280} height={896} className="relative w-full rounded-[2rem] object-cover shadow-glow" />
+              <div className="glass animate-float absolute -bottom-6 left-4 flex items-center gap-3 rounded-2xl p-4 md:left-[-1.5rem]">
+                <div className="grid h-10 w-10 place-items-center rounded-full bg-gradient-primary text-primary-foreground"><Sparkles size={18} /></div>
+                <div><p className="font-display text-xl font-extrabold text-gradient">+120</p><p className="text-xs text-muted-foreground">proyectos entregados</p></div>
+              </div>
+            </div>
+          </motion.div>
+          <motion.div {...fade} className="col-lg-6">
+            <p className="text-sm font-bold uppercase tracking-widest text-primary">Nuestro equipo</p>
+            <h2 className="mt-3 text-3xl font-extrabold md:text-5xl">Expertos en <span className="text-gradient">IA y automatización</span></h2>
+            <p className="mt-4 text-muted-foreground">Ingenieros, analistas y diseñadores que convierten tus procesos en sistemas inteligentes que trabajan 24/7.</p>
+            <ul className="mt-6 space-y-3">
+              {["Consultoría estratégica sin costo", "Soporte y monitoreo continuo", "Capacitación para tu equipo"].map((t) => (
+                <li key={t} className="flex items-center gap-3"><CheckCircle2 className="text-primary" size={20} />{t}</li>
+              ))}
+            </ul>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Why */}
       <section className="container py-16">
         <div className="glass relative overflow-hidden rounded-[2rem] p-8 md:p-14">
@@ -229,6 +333,37 @@ function Index() {
         </div>
       </section>
 
+      {/* Testimonials */}
+      <section className="container py-16">
+        <motion.div {...fade} className="mb-12 text-center">
+          <p className="text-sm font-bold uppercase tracking-widest text-primary">Testimonios</p>
+          <h2 className="mt-3 text-3xl font-extrabold md:text-5xl">Lo que dicen <span className="text-gradient">nuestros clientes</span></h2>
+        </motion.div>
+        <div className="row g-4">
+          {testimonials.map((t, i) => (
+            <motion.div key={t.n} {...fade} transition={{ ...fade.transition, delay: i * 0.1 }} className="col-md-4">
+              <div className="card-tilt glass h-full rounded-3xl p-6">
+                <div className="flex gap-1 text-primary">{[0,1,2,3,4].map((k) => <Star key={k} size={16} fill="currentColor" />)}</div>
+                <p className="mt-4">“{t.q}”</p>
+                <div className="mt-6 flex items-center gap-3">
+                  <div className="grid h-10 w-10 place-items-center rounded-full bg-gradient-primary font-bold text-primary-foreground">{t.n[0]}</div>
+                  <div><p className="font-bold">{t.n}</p><p className="text-xs text-muted-foreground">{t.r}</p></div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="container py-16">
+        <motion.div {...fade} className="mb-10 text-center">
+          <p className="text-sm font-bold uppercase tracking-widest text-primary">Preguntas frecuentes</p>
+          <h2 className="mt-3 text-3xl font-extrabold md:text-5xl">¿Tienes <span className="text-gradient">dudas</span>?</h2>
+        </motion.div>
+        <Faq />
+      </section>
+
       {/* CTA / Contact */}
       <section id="contacto" className="container scroll-mt-24 py-16">
         <motion.div {...fade} className="relative overflow-hidden rounded-[2rem] bg-gradient-primary p-10 text-center text-primary-foreground shadow-glow md:p-16">
@@ -244,6 +379,7 @@ function Index() {
         © {new Date().getFullYear()} IEC IA · Automatización con Inteligencia Artificial
       </footer>
 
+      <ScrollBar />
       <ChatBot open={chat} setOpen={setChat} />
 
       {/* Mobile native-style tab bar */}
