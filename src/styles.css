@@ -35,6 +35,11 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-glass: var(--glass);
+  --color-cinema: var(--cinema);
+  --color-cinema-foreground: var(--cinema-foreground);
+  --color-cinema-muted: var(--cinema-muted);
+  --color-cinema-surface: var(--cinema-surface);
+  --color-cinema-border: var(--cinema-border);
 }
 
 :root {
@@ -65,6 +70,12 @@
   --gradient-bg: radial-gradient(1200px 600px at 10% -10%, oklch(0.85 0.09 230 / 0.6), transparent 60%), radial-gradient(900px 500px at 100% 10%, oklch(0.8 0.12 260 / 0.45), transparent 60%);
   --shadow-glow: 0 20px 50px -15px oklch(0.55 0.2 255 / 0.45);
   --particle: #2b6cff;
+  --cinema: oklch(0.13 0.045 263);
+  --cinema-foreground: oklch(0.97 0.01 240);
+  --cinema-muted: oklch(0.76 0.035 245);
+  --cinema-surface: oklch(0.18 0.05 263);
+  --cinema-border: oklch(0.82 0.08 240 / 0.2);
+  --shadow-cinema: 0 40px 120px -30px oklch(0.45 0.2 255 / 0.6);
 }
 
 .dark {
@@ -120,6 +131,39 @@
   border: 1px solid var(--color-border);
 }
 @utility pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 0.5rem); }
+@utility shadow-cinema { box-shadow: var(--shadow-cinema); }
+
+.video-cinema { background: var(--cinema); color: var(--cinema-foreground); }
+.cinema-grid {
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--cinema-foreground) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--cinema-foreground) 5%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
+  opacity: .45;
+}
+.cinema-orb { background: var(--gradient-primary); filter: blur(120px); opacity: .18; }
+.cinema-vignette {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--cinema) 45%, transparent), transparent 35%, color-mix(in oklab, var(--cinema) 45%, transparent));
+}
+.cinema-chip, .cinema-control, .cinema-caption {
+  color: var(--cinema-foreground);
+  background: color-mix(in oklab, var(--cinema) 68%, transparent);
+  border: 1px solid var(--cinema-border);
+  backdrop-filter: blur(20px) saturate(1.4);
+}
+.cinema-control { transition: transform .2s ease, background-color .2s ease; }
+.cinema-control:hover { transform: scale(1.04); background: color-mix(in oklab, var(--cinema) 85%, transparent); }
+.video-shell { transform-origin: center; will-change: transform, border-radius; }
+.cinema-intro, .story-caption, .cinema-outro { will-change: transform, opacity; }
+
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  .video-shell, .cinema-intro, .story-caption, .cinema-outro { will-change: auto; }
+}
 
 .btn-hero {
   display: inline-flex; align-items: center; gap: .5rem;

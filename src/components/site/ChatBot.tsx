@@ -62,7 +62,7 @@ export function ChatBot({ open, setOpen }: { open: boolean; setOpen: (v: boolean
                 <p className="text-xs opacity-80">En línea · responde al instante</p>
               </div>
             </div>
-            <div ref={box} className="flex-1 space-y-3 overflow-y-auto overscroll-contain p-4">
+            <div ref={box} data-lenis-prevent className="flex-1 space-y-3 overflow-y-auto overscroll-contain p-4">
               {msgs.map((m, i) => (
                 <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                   className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${m.role === "user" ? "ml-auto bg-gradient-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}>

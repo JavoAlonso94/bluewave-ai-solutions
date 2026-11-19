@@ -63,6 +63,7 @@ function Faq() {
 
 const Hero3D = lazy(() => import("@/components/site/Hero3D"));
 const ParticlesBg = lazy(() => import("@/components/site/ParticlesBg"));
+const SmoothScroll = lazy(() => import("@/components/site/SmoothScroll"));
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -135,7 +136,7 @@ function Index() {
   ];
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden pb-24 md:pb-0">
+    <div className="relative min-h-screen overflow-x-clip pb-24 md:pb-0">
       {/* Top bar: app header on mobile, navbar on desktop */}
       <header className="glass fixed inset-x-0 top-0 z-40 md:inset-x-4 md:top-4 md:rounded-full">
         <div className="container flex h-16 items-center justify-between px-4 md:px-6">
@@ -382,6 +383,7 @@ function Index() {
       </footer>
 
       <ScrollBar />
+      {mounted && <Suspense fallback={null}><SmoothScroll /></Suspense>}
       <div className="blur-orb left-[-10%] top-[30%] h-96 w-96" />
       <div className="blur-orb right-[-10%] top-[70%] h-[28rem] w-[28rem]" style={{ animationDelay: "-7s" }} />
       <ChatBot open={chat} setOpen={setChat} />

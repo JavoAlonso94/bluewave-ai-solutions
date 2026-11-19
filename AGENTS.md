@@ -31,3 +31,4 @@ use the editor.
 
 - Landing uses Tailwind for styling plus bootstrap-grid only (layout grid); full Bootstrap CSS would clash with Tailwind preflight.
 - Chat bot posts to n8n via a server function reading N8N_WEBHOOK_URL; never call the webhook from the browser.
+- Scroll-driven scenes use GSAP ScrollTrigger and Lenis loaded only in the browser; keep native touch scrolling and reduced-motion fallbacks so the effects never block reading or playback.
