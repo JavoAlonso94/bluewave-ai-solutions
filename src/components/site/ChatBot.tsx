@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Bot, Send, X } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { sendChatMessage } from "@/lib/chat.functions";
+import { createSessionId } from "@/lib/session-id";
 
 type Msg = { role: "bot" | "user"; text: string };
 
@@ -16,7 +17,7 @@ export function ChatBot({ open, setOpen }: { open: boolean; setOpen: (v: boolean
   const sid = useRef("");
   const box = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    sid.current = localStorage.getItem("iec-sid") || crypto.randomUUID();
+    sid.current = localStorage.getItem("iec-sid") || createSessionId();
     localStorage.setItem("iec-sid", sid.current);
   }, []);
   useEffect(() => { const b = box.current; if (b) b.scrollTo({ top: b.scrollHeight, behavior: "smooth" }); }, [msgs, loading]);
