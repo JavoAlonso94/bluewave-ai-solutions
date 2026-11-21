@@ -2,7 +2,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, Line, MeshDistortMaterial, Sphere, Torus, Icosahedron, Environment, Lightformer } from "@react-three/drei";
 import { useReducedMotion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CanvasTexture, Group, LinearFilter, Mesh, SRGBColorSpace } from "three";
+import { CanvasTexture, Group, LinearFilter, MathUtils, Mesh, SRGBColorSpace, Vector3 } from "three";
 import soraFont from "@/assets/fonts/Sora-Bold.ttf";
 
 const growthPoints: [number, number, number][] = [
@@ -24,6 +24,8 @@ type SolidTextProps = {
   delay: number;
   reduceMotion: boolean;
   letterSpacing?: number;
+  /** 0–1: cuánto se retrasa la línea respecto al movimiento de la esfera. */
+  lag?: number;
 };
 
 const HERO_FONT = "EliteNetHeroSora";
@@ -68,8 +70,12 @@ function useTextTexture(text: string, letterSpacing: number, fontReady: boolean)
   return result;
 }
 
-function SolidText({ children, position, fontSize, color, depthColor, delay, reduceMotion, letterSpacing = 0 }: SolidTextProps) {
+function SolidText({ children, position, fontSize, color, depthColor, delay, reduceMotion, letterSpacing = 0, lag = 0 }: SolidTextProps) {
   const group = useRef<Group>(null);
+  const layers = useRef<(Mesh | null)[]>([]);
+  const worldPos = useMemo(() => new Vector3(), []);
+  const localPos = useMemo(() => new Vector3(), []);
+  const lagged = useRef<Vector3 | null>(null);
   const [fontReady, setFontReady] = useState(false);
   useEffect(() => {
     let alive = true;
@@ -80,12 +86,44 @@ function SolidText({ children, position, fontSize, color, depthColor, delay, red
   const baseY = position[1];
   const depth = fontSize * 0.085;
 
-  useFrame(({ clock }) => {
-    if (!group.current) return;
-    const progress = entranceProgress(clock.elapsedTime, delay, reduceMotion);
-    group.current.visible = progress > 0;
-    group.current.scale.setScalar(0.86 + progress * 0.14);
-    group.current.position.y = baseY - (1 - progress) * 0.1;
+  useFrame(({ clock, camera }, delta) => {
+    const g = group.current;
+    if (!g) return;
+    const t = clock.elapsedTime;
+    const progress = entranceProgress(t, delay, reduceMotion);
+    g.visible = progress > 0;
+    g.scale.setScalar(0.86 + progress * 0.14);
+
+    let ox = 0;
+    let oy = 0;
+    const parent = g.parent;
+    if (!reduceMotion && parent) {
+      // Sigue el movimiento real de la esfera (Float) con un retraso propio de cada línea.
+      parent.getWorldPosition(worldPos);
+      if (!lagged.current) lagged.current = worldPos.clone();
+      const dt = Math.min(delta, 0.05);
+      lagged.current.lerp(worldPos, 1 - Math.exp(-dt * (9 - lag * 5)));
+      localPos.copy(lagged.current);
+      parent.worldToLocal(localPos);
+      const amount = 1.4 + lag * 2.2;
+      ox = MathUtils.clamp(localPos.x * amount, -0.09, 0.09);
+      oy = MathUtils.clamp(localPos.y * amount, -0.09, 0.09);
+      // Ola suave escalonada, sincronizada con el ritmo de flotación.
+      const phase = t * 1.8 - lag * 2.4;
+      oy += Math.sin(phase) * 0.012 * progress;
+      g.rotation.set(-oy * 1.6, ox * 2.2, -ox * 1.2 + Math.sin(phase * 0.7) * 0.02 * progress);
+      // Profundidad: las capas traseras se desplazan contra la cámara.
+      layers.current.forEach((m, i) => {
+        if (!m) return;
+        const k = depth * (i === 0 ? 1.6 : 0.8) * 1.8;
+        m.position.x = -camera.position.x * k - ox * 0.25;
+        m.position.y = -camera.position.y * k - oy * 0.25;
+      });
+    } else {
+      g.rotation.set(0, 0, 0);
+    }
+    g.position.x = position[0] + ox;
+    g.position.y = baseY + oy - (1 - progress) * 0.1;
   });
 
   if (!tex) return null;
@@ -94,8 +132,8 @@ function SolidText({ children, position, fontSize, color, depthColor, delay, red
 
   return (
     <group ref={group} position={position} visible={reduceMotion}>
-      {[1.6, 0.8].map((layer) => (
-        <mesh key={layer} position={[0, 0, -depth * layer]} renderOrder={3}>
+      {[1.6, 0.8].map((layer, i) => (
+        <mesh key={layer} ref={(m) => { layers.current[i] = m; }} position={[0, 0, -depth * layer]} renderOrder={3}>
           <planeGeometry args={[w, h]} />
           <meshBasicMaterial map={tex.texture} color={depthColor} transparent depthTest={false} depthWrite={false} toneMapped={false} />
         </mesh>
@@ -126,16 +164,16 @@ function GrowthMessage({ dark }: { dark: boolean }) {
 
   return (
     <group position={[0, 0, 1.42]}>
-      <SolidText position={[0, 0.59, 0]} fontSize={0.075} letterSpacing={0.2} color={accent} depthColor={depth} delay={0} reduceMotion={reduceMotion}>
+      <SolidText position={[0, 0.59, 0]} fontSize={0.075} letterSpacing={0.2} color={accent} depthColor={depth} delay={0} lag={0} reduceMotion={reduceMotion}>
         IMPULSO CON IA
       </SolidText>
-      <SolidText position={[0, 0.32, 0]} fontSize={0.165} color={ink} depthColor={depth} delay={0.1} reduceMotion={reduceMotion}>
+      <SolidText position={[0, 0.32, 0]} fontSize={0.165} color={ink} depthColor={depth} delay={0.1} lag={0.33} reduceMotion={reduceMotion}>
         Implementa tu fuerza
       </SolidText>
-      <SolidText position={[0, 0.03, 0]} fontSize={0.29} color={accent} depthColor={depth} delay={0.22} reduceMotion={reduceMotion}>
+      <SolidText position={[0, 0.03, 0]} fontSize={0.29} color={accent} depthColor={depth} delay={0.22} lag={0.66} reduceMotion={reduceMotion}>
         desarrollo
       </SolidText>
-      <SolidText position={[0, -0.28, 0]} fontSize={0.255} color={accent} depthColor={depth} delay={0.34} reduceMotion={reduceMotion}>
+      <SolidText position={[0, -0.28, 0]} fontSize={0.255} color={accent} depthColor={depth} delay={0.34} lag={1} reduceMotion={reduceMotion}>
         y crecimiento
       </SolidText>
 
