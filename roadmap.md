@@ -10,3 +10,4 @@
 - [x] Darle más azul al hero en modo día sin perder el modelo 3D, y renombrar la marca a EliteNet.
 - [x] Integrar el nuevo logotipo de EliteNet (lámina de variantes) en encabezado, preloader y favicon.
 - [x] Añadir un preloader de carga con la marca y degradados azules.
+- [x] Animar «Implementa tu fuerza desarrollo y crecimiento» dentro de la esfera 3D con cristal y flecha de crecimiento.
