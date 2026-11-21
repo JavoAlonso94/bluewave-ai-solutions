@@ -232,7 +232,7 @@ function Index() {
                 <div className="absolute inset-0" data-hero-3d>
                   {mounted && <SafeBoundary><Suspense fallback={null}><Hero3D dark={dark} /></Suspense></SafeBoundary>}
                 </div>
-                <p className="sr-only">Implementa tu fuerza desarrollo y crecimiento</p>
+                <p className="sr-only">Implementa tu fuerza desarrollo y crecimiento. El Net te ayuda</p>
               </div>
             </div>
           </div>

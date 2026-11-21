@@ -276,7 +276,7 @@ function GrowthMessage({ dark }: { dark: boolean }) {
     if (!arrow.current) return;
     const progress = entranceProgress(clock.elapsedTime, 0.85, reduceMotion);
     arrow.current.visible = progress > 0;
-    arrow.current.scale.setScalar(0.72 + progress * 0.28);
+    arrow.current.scale.setScalar((0.72 + progress * 0.28) * 0.85);
     if (tip.current) tip.current.scale.setScalar(reduceMotion ? 1 : 1 + Math.sin(clock.elapsedTime * 3) * 0.12);
   });
 
@@ -332,9 +332,21 @@ function GrowthMessage({ dark }: { dark: boolean }) {
         >
           y crecimiento
         </CurvedText>
+        <CurvedText
+          y={-0.56}
+          radius={1.46}
+          fontSize={0.12}
+          color="#f3f8ff"
+          depthColor={depth}
+          delay={0.46}
+          lag={1}
+          reduceMotion={reduceMotion}
+        >
+          El Net te ayuda
+        </CurvedText>
       </group>
 
-      <group ref={arrow} position={[0, -0.15, 1.42]} visible={reduceMotion}>
+      <group ref={arrow} position={[0, -0.52, 1.42]} visible={reduceMotion}>
         <Line points={[[-0.78, -0.79, -0.01], [0.74, -0.79, -0.01]]} color={accent} lineWidth={1} transparent opacity={0.24} depthTest={false} />
         <Line points={growthPoints} color={accent} lineWidth={2.6} renderOrder={5} depthTest={false} />
         <Line points={[[0.43, -0.34, 0], [0.64, -0.34, 0], [0.61, -0.55, 0]]} color={accent} lineWidth={2.6} renderOrder={5} depthTest={false} />
@@ -390,7 +402,7 @@ export default function Hero3D({ dark }: { dark: boolean }) {
       dpr={[1, 1.75]}
       gl={{ alpha: true, antialias: true }}
       role="img"
-      aria-label="Esfera 3D con el mensaje Implementa tu fuerza desarrollo y crecimiento"
+      aria-label="Esfera 3D con el mensaje Implementa tu fuerza desarrollo y crecimiento. El Net te ayuda"
     >
       <ambientLight intensity={0.5} />
       <directionalLight position={[4, 5, 3]} intensity={1.4} />
