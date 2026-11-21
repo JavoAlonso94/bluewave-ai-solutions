@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { Preloader } from "@/components/site/Preloader";
 
 function NotFoundComponent() {
   return (
@@ -84,9 +85,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport-fit", content: "cover" },
       { name: "theme-color", content: "#0b1430" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
-      { title: "IEC IA" },
+      { title: "EliteNet" },
       { name: "description", content: "Automatización con Inteligencia Artificial" },
-      { property: "og:title", content: "IEC IA" },
+      { property: "og:title", content: "EliteNet" },
       { property: "og:description", content: "Automatización con Inteligencia Artificial" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -113,7 +114,7 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="es" className="dark" suppressHydrationWarning>
       <head>
         <HeadContent />
-        <script dangerouslySetInnerHTML={{ __html: `try{if(localStorage.getItem("iec-theme")==="light")document.documentElement.classList.remove("dark")}catch(e){}` }} />
+        <script dangerouslySetInnerHTML={{ __html: `try{if(localStorage.getItem("iec-theme")==="light")document.documentElement.classList.remove("dark")}catch(e){}setTimeout(function(){document.documentElement.classList.add("preloader-off")},1500)` }} />
       </head>
       <body>
         {children}
@@ -128,6 +129,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <Preloader />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>

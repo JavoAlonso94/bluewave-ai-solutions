@@ -26,7 +26,7 @@ const scenarios = [
     topic: "Consulta sobre automatización",
     result: "Cita agendada en el CRM",
     transcript: [
-      { speaker: "agent", text: "Hola Mariana, soy el asistente de IEC IA. ¿Qué proceso te gustaría automatizar?" },
+      { speaker: "agent", text: "Hola Mariana, soy el asistente de EliteNet. ¿Qué proceso te gustaría automatizar?" },
       { speaker: "caller", text: "Recibimos muchas consultas y no damos seguimiento a todas." },
       { speaker: "agent", text: "Podemos centralizar WhatsApp y llamadas, calificar cada contacto y avisar a tu equipo cuando esté listo." },
       { speaker: "caller", text: "Suena bien. ¿Podemos verlo esta semana?" },
@@ -217,7 +217,7 @@ export function CallCenterShowcase() {
                 <span className={`absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-background bg-primary ${running ? "animate-pulse" : ""}`} />
               </div>
               <div>
-                <p className="font-bold">Agente IEC · Voz 01</p>
+                <p className="font-bold">Agente EliteNet · Voz 01</p>
                 <p className="flex items-center gap-1.5 text-xs text-muted-foreground"><Radio size={12} /> Consola inteligente</p>
               </div>
             </div>

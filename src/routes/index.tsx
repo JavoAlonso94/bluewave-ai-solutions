@@ -13,8 +13,8 @@ import { ServiceExplorer } from "@/components/site/ServiceExplorer";
 import { ProcessJourney } from "@/components/site/ProcessJourney";
 import { motion as m2, useScroll, useSpring, AnimatePresence } from "framer-motion";
 import { ChevronDown, Star, CheckCircle2 } from "lucide-react";
-import logoLight from "@/assets/iec-logo-light.png";
-import logoDark from "@/assets/iec-logo-dark.png";
+import logoLight from "@/assets/elitnet-logo-day.png";
+import logoDark from "@/assets/elitnet-logo-night.png";
 import teamImg from "@/assets/team-ai.jpg";
 import serversImg from "@/assets/ai-servers.jpg";
 import waImg from "@/assets/whatsapp-ai.jpg";
@@ -75,9 +75,9 @@ const SmoothScroll = lazy(() => import("@/components/site/SmoothScroll"));
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "IEC IA — Automatización con Inteligencia Artificial" },
+      { title: "EliteNet — Automatización con Inteligencia Artificial" },
       { name: "description", content: "Call center con IA, chatbots, flujos avanzados con n8n, ERP, CRM y WhatsApp automatizado para tu empresa." },
-      { property: "og:title", content: "IEC IA — Automatización con Inteligencia Artificial" },
+      { property: "og:title", content: "EliteNet — Automatización con Inteligencia Artificial" },
       { property: "og:description", content: "Explora agentes de voz, chatbots y flujos n8n que conectan toda tu empresa." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -166,9 +166,8 @@ function Index() {
       {/* Top bar: app header on mobile, navbar on desktop */}
       <header className="glass fixed inset-x-0 top-0 z-40 md:inset-x-4 md:top-4 md:rounded-full">
         <div className="container flex h-16 items-center justify-between px-4 md:px-6">
-          <a href="#inicio" className="flex items-center gap-2">
-            <img src={logoLight} alt="IEC IA" width={44} height={34} className="h-11 w-auto dark:hidden" /><img src={logoDark} alt="IEC IA" width={44} height={34} className="hidden h-11 w-auto dark:block" />
-            <span className="font-display text-lg font-bold">IEC <span className="text-gradient">IA</span></span>
+          <a href="#inicio" className="flex items-center">
+            <img src={logoLight} alt="EliteNet" width={118} height={36} className="h-9 w-auto md:h-10 dark:hidden" /><img src={logoDark} alt="EliteNet" width={118} height={36} className="hidden h-9 w-auto md:h-10 dark:block" />
           </a>
           <nav className="hidden items-center gap-5 text-xs font-semibold lg:flex xl:gap-7 xl:text-sm" aria-label="Navegación principal">
             {desktopNav.map((n) => (
@@ -193,13 +192,14 @@ function Index() {
       </header>
 
       {/* HERO */}
-      <section id="inicio" className="relative flex min-h-[100svh] items-center pt-20">
+      <section id="inicio" className="relative flex min-h-[100svh] items-center pt-20 pb-28 lg:pb-0">
+        <div className="hero-blue absolute inset-0" aria-hidden="true" />
         <div className="absolute inset-0 -z-0">
           {mounted && <Suspense fallback={null}><ParticlesBg dark={dark} /></Suspense>}
         </div>
         <div className="container relative">
           <div className="row align-items-center g-5">
-            <div className="col-lg-6 text-center lg:text-left">
+            <div className="col-md-6 text-center lg:text-left">
               <motion.span {...fade} className="glass inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold">
                 <Sparkles size={14} className="text-primary" /> Automatización con Inteligencia Artificial
               </motion.span>
@@ -248,8 +248,9 @@ function Index() {
                 <button onClick={() => setChat(true)} className="btn-ghost-glass">Habla con el bot</button>
               </motion.div>
             </div>
-            <div className="col-lg-6">
+            <div className="col-md-6">
               <div className="relative mx-auto aspect-square w-full max-w-[520px]">
+                <div className="hero-orb-halo absolute inset-2 rounded-full" />
                 <div className="absolute inset-10 rounded-full bg-gradient-primary opacity-30 blur-3xl" />
                 {mounted && <Suspense fallback={null}><Hero3D /></Suspense>}
               </div>
@@ -322,7 +323,7 @@ function Index() {
           <motion.div {...fade} className="col-lg-6">
             <div className="relative">
               <div className="absolute -inset-3 rounded-[2rem] bg-gradient-primary opacity-40 blur-2xl" />
-              <img src={teamImg} alt="Equipo de IEC IA trabajando con paneles de IA" loading="lazy" width={1280} height={896} className="relative w-full rounded-[2rem] object-cover shadow-glow" />
+              <img src={teamImg} alt="Equipo de EliteNet trabajando con paneles de IA" loading="lazy" width={1280} height={896} className="relative w-full rounded-[2rem] object-cover shadow-glow" />
               <div className="glass animate-float absolute -bottom-6 left-4 flex items-center gap-3 rounded-2xl p-4 md:left-[-1.5rem]">
                 <div className="grid h-10 w-10 place-items-center rounded-full bg-gradient-primary text-primary-foreground"><Sparkles size={18} /></div>
                 <div><p className="font-display text-xl font-extrabold text-gradient">+120</p><p className="text-xs text-muted-foreground">proyectos entregados</p></div>
@@ -348,7 +349,7 @@ function Index() {
           <div className="animate-float absolute -right-20 -top-20 h-72 w-72 rounded-full bg-gradient-primary opacity-30 blur-3xl" />
           <div className="row g-5 align-items-center relative">
             <motion.div {...fade} className="col-lg-5">
-              <h2 className="text-3xl font-extrabold md:text-4xl">¿Por qué <span className="text-gradient">IEC IA</span>?</h2>
+              <h2 className="text-3xl font-extrabold md:text-4xl">¿Por qué <span className="text-gradient">EliteNet</span>?</h2>
               <p className="mt-4 text-muted-foreground">Implementamos IA real que genera resultados medibles desde el primer mes.</p>
             </motion.div>
             <div className="col-lg-7">
@@ -415,7 +416,7 @@ function Index() {
       </section>
 
       <footer className="container py-10 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} IEC IA · Automatización con Inteligencia Artificial
+        © {new Date().getFullYear()} EliteNet · Automatización con Inteligencia Artificial
       </footer>
 
       <ScrollBar />

@@ -179,7 +179,7 @@ export function VideoShowcase({ src, poster }: { src: string; poster?: string })
             <span className="block text-gradient">a un mensaje de distancia.</span>
           </h2>
           <p className="mx-auto mt-6 max-w-2xl text-base text-cinema-muted md:text-xl">
-            Mira cómo un chatbot de IEC IA convierte la consulta de un gimnasio en una inscripción.
+            Mira cómo un chatbot de EliteNet convierte la consulta de un gimnasio en una inscripción.
           </p>
           {!reducedMotion && (
             <p className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-cinema-muted">
@@ -251,7 +251,7 @@ export function VideoShowcase({ src, poster }: { src: string; poster?: string })
             ))}
             <div className="cinema-outro pointer-events-none absolute inset-x-4 bottom-40 z-20 mx-auto max-w-xl text-center opacity-0 md:bottom-8">
               <p className="font-display text-2xl font-bold md:text-4xl">Vende más. Responde siempre.</p>
-              <p className="mt-2 text-sm text-cinema-muted md:text-base">Una demo de BatorGYM creada para IEC IA.</p>
+              <p className="mt-2 text-sm text-cinema-muted md:text-base">Una demo de BatorGYM creada para EliteNet.</p>
             </div>
           </>
         )}

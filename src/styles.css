@@ -231,3 +231,82 @@ html.lenis, html.lenis body { height: auto; }
 .pulse-ring::before { content: ""; position: absolute; inset: 0; border-radius: 999px; background-image: var(--gradient-primary); animation: pulse-ring 2s ease-out infinite; z-index: -1; }
 
 .blur-orb { position: fixed; z-index: -1; border-radius: 9999px; filter: blur(110px); opacity: .35; pointer-events: none; background: var(--gradient-primary, var(--color-primary)); animation: float-y 14s ease-in-out infinite; }
+
+/* Hero: deeper blue wash in day mode; the 3D model keeps a light halo so it never blends in */
+.hero-blue {
+  background:
+    radial-gradient(760px 560px at 78% 54%, oklch(0.58 0.19 252 / 0.75), transparent 68%),
+    radial-gradient(700px 470px at 4% 6%, oklch(0.93 0.06 228 / 0.95), transparent 62%),
+    linear-gradient(158deg, oklch(0.93 0.05 230) 0%, oklch(0.85 0.1 240) 46%, oklch(0.7 0.16 251) 100%);
+}
+.hero-blue::after {
+  content: ""; position: absolute; inset-inline: 0; bottom: 0; height: 24%;
+  background: linear-gradient(180deg, transparent, var(--color-background));
+}
+.hero-orb-halo {
+  background: radial-gradient(circle at 50% 50%, oklch(0.99 0.012 240 / 0.9), oklch(0.96 0.03 236 / 0.5) 44%, transparent 72%);
+}
+.dark .hero-blue, .dark .hero-orb-halo { opacity: 0; }
+
+/* ============ Preloader de marca ============ */
+.preloader {
+  position: fixed; inset: 0; z-index: 100;
+  display: grid; place-items: center; overflow: hidden;
+  background:
+    radial-gradient(760px 540px at 50% 40%, oklch(0.34 0.14 258 / 0.95), transparent 70%),
+    radial-gradient(520px 420px at 10% 92%, oklch(0.28 0.12 232 / 0.9), transparent 68%),
+    oklch(0.145 0.05 258);
+}
+.preloader-orb {
+  position: absolute; border-radius: 9999px; filter: blur(90px); pointer-events: none;
+}
+.preloader-orb-a {
+  width: 46vw; height: 46vw; max-width: 520px; max-height: 520px;
+  top: -8%; right: -6%; background: oklch(0.52 0.2 254 / 0.5);
+}
+.preloader-orb-b {
+  width: 40vw; height: 40vw; max-width: 460px; max-height: 460px;
+  bottom: -10%; left: -8%; background: oklch(0.46 0.16 232 / 0.42);
+}
+.preloader-ring {
+  position: absolute; inset: 0; border-radius: 9999px;
+  background: conic-gradient(from 0deg, transparent 0 52%, oklch(0.6 0.19 252) 78%, oklch(0.78 0.19 152) 96%, transparent 100%);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+  animation: preloader-spin 1.15s linear infinite;
+}
+@keyframes preloader-spin { to { transform: rotate(360deg); } }
+.preloader-caption {
+  font-size: .66rem; letter-spacing: .34em; text-transform: uppercase;
+  color: oklch(0.79 0.07 250);
+  animation: pl-in .35s ease .22s both;
+}
+.preloader-mark { animation: pl-pop .5s cubic-bezier(.2,.8,.2,1) both; }
+.preloader-word { animation: pl-up .45s ease .1s both; }
+@keyframes pl-pop { from { opacity: 0; transform: scale(.86); } to { opacity: 1; transform: scale(1); } }
+@keyframes pl-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes pl-in { from { opacity: 0; } to { opacity: 1; } }
+.preloader-bar {
+  width: min(240px, 62vw); height: 3px; border-radius: 9999px; overflow: hidden;
+  background: oklch(0.31 0.05 258);
+}
+.preloader-bar-fill {
+  height: 100%; width: 0; border-radius: inherit;
+  background: linear-gradient(90deg, oklch(0.62 0.19 252), oklch(0.78 0.19 152));
+  animation: preloader-fill 1.5s cubic-bezier(.2,.8,.2,1) forwards;
+}
+@keyframes preloader-fill { to { width: 100%; } }
+/* Retirada garantida: un script en el <head> añade esta clase pasados 1.5 s,
+   y la animación CSS la cubre cuando la hoja de estilos carga pronto */
+.preloader {
+  transition: opacity .45s ease, visibility .45s ease;
+  animation: preloader-fallback .45s linear 1.5s forwards;
+}
+@keyframes preloader-fallback { to { opacity: 0; visibility: hidden; pointer-events: none; } }
+.preloader-off .preloader {
+  opacity: 0 !important; visibility: hidden !important; pointer-events: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .preloader-ring { animation: none; }
+  .preloader-bar-fill { animation-duration: .8s; }
+}

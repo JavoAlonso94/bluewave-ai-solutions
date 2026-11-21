@@ -1,13 +1,16 @@
 # Materiales del proyecto
 
-Todos los archivos multimedia utilizados por IEC IA están incluidos directamente en este repositorio. La aplicación importa sus imágenes y videos desde `src/assets`; ya no depende de punteros `.asset.json` para estos materiales.
+Todos los archivos multimedia utilizados por EliteNet están incluidos directamente en este repositorio. La aplicación importa sus imágenes y videos desde `src/assets`; ya no depende de punteros `.asset.json` para estos materiales.
 
 ## Recursos usados por la página
 
 | Archivo | Contenido | Uso |
 | --- | --- | --- |
-| `src/assets/iec-logo-light.png` | Logotipo para modo día, PNG con transparencia, 494 × 386 | Encabezado |
-| `src/assets/iec-logo-dark.png` | Logotipo para modo noche, PNG con transparencia, 494 × 386 | Encabezado |
+| `src/assets/elitnet-logo-day.png` | Logotipo horizontal para modo día (azul marino + punto verde), PNG con transparencia, 573 × 175 | Encabezado |
+| `src/assets/elitnet-logo-night.png` | Logotipo horizontal para modo noche (blanco + punto verde), PNG con transparencia, 573 × 175 | Encabezado |
+| `src/assets/elitnet-mark-day.png` | Símbolo (isotipo) para modo día, PNG con transparencia, 175 × 175 | Preloader, marca |
+| `src/assets/elitnet-mark-night.png` | Símbolo (isotipo) para modo noche, PNG con transparencia, 175 × 175 | Preloader |
+| `src/assets/elitnet-word-night.png` | Nombre "EliteNet" en blanco, PNG con transparencia, 344 × 175 | Preloader |
 | `src/assets/team-ai.jpg` | Fotografía del equipo | Sección de equipo |
 | `src/assets/ai-servers.jpg` | Infraestructura de IA | Casos y servicios |
 | `src/assets/whatsapp-ai.jpg` | Automatización de WhatsApp | Casos y servicios |

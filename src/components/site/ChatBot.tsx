@@ -10,7 +10,7 @@ type Msg = { role: "bot" | "user"; text: string };
 export function ChatBot({ open, setOpen }: { open: boolean; setOpen: (v: boolean) => void }) {
   const send = useServerFn(sendChatMessage);
   const [msgs, setMsgs] = useState<Msg[]>([
-    { role: "bot", text: "¡Hola! Soy el asistente de IEC IA 👋 ¿Qué proceso te gustaría automatizar?" },
+    { role: "bot", text: "¡Hola! Soy el asistente de EliteNet 👋 ¿Qué proceso te gustaría automatizar?" },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -43,7 +43,7 @@ export function ChatBot({ open, setOpen }: { open: boolean; setOpen: (v: boolean
       <button
         aria-label="Abrir chat"
         onClick={() => setOpen(!open)}
-        className="pulse-ring fixed bottom-24 right-5 z-50 grid h-14 w-14 place-items-center rounded-full bg-gradient-primary text-primary-foreground shadow-glow md:bottom-6"
+        className="pulse-ring fixed bottom-24 right-5 z-50 grid h-14 w-14 place-items-center rounded-full bg-gradient-primary text-primary-foreground shadow-glow lg:bottom-6"
       >
         {open ? <X /> : <Bot />}
       </button>
@@ -54,12 +54,12 @@ export function ChatBot({ open, setOpen }: { open: boolean; setOpen: (v: boolean
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ type: "spring", damping: 22, stiffness: 260 }}
-            className="glass fixed inset-x-3 bottom-40 z-50 flex h-[60vh] flex-col overflow-hidden rounded-3xl shadow-glow md:inset-x-auto md:bottom-24 md:right-6 md:h-[520px] md:w-[380px]"
+            className="glass fixed inset-x-3 bottom-40 z-50 flex h-[60vh] flex-col overflow-hidden rounded-3xl shadow-glow md:inset-x-auto md:right-6 md:h-[520px] md:w-[380px] lg:bottom-24"
           >
             <div className="flex items-center gap-3 bg-gradient-primary p-4 text-primary-foreground">
               <div className="grid h-10 w-10 place-items-center rounded-full bg-background/20"><Bot size={20} /></div>
               <div>
-                <p className="font-display font-bold leading-tight">Asistente IEC IA</p>
+                <p className="font-display font-bold leading-tight">Asistente EliteNet</p>
                 <p className="text-xs opacity-80">En línea · responde al instante</p>
               </div>
             </div>

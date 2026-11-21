@@ -27,7 +27,7 @@ function Core() {
       <Torus ref={ring2} args={[2.35, 0.02, 16, 120]} rotation={[1.2, 0, 0]}>
         <meshStandardMaterial color="#a9d8ff" emissive="#5aa9ff" emissiveIntensity={0.6} />
       </Torus>
-      {[[-2.4, 1.3, -0.5], [2.5, -1.1, 0.3], [1.9, 1.7, -1]].map((p, i) => (
+      {[[-1.85, 1.15, -0.5], [1.95, -0.95, 0.3], [1.5, 1.45, -1]].map((p, i) => (
         <Float key={i} speed={3 + i} floatIntensity={2}>
           <Icosahedron args={[0.22 + i * 0.05, 0]} position={p as [number, number, number]}>
             <meshStandardMaterial color="#4ea1ff" metalness={0.7} roughness={0.25} flatShading />

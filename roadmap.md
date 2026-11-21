@@ -7,3 +7,6 @@
 - [x] Añadir flujos avanzados con n8n mediante escenarios seleccionables y ejecución visual paso a paso.
 - [x] Mejorar la exploración de servicios, el proceso y la navegación activa en escritorio y móvil.
 - [x] Verificar en navegador las interacciones nuevas, los modos día/noche y la experiencia móvil.
+- [x] Darle más azul al hero en modo día sin perder el modelo 3D, y renombrar la marca a EliteNet.
+- [x] Integrar el nuevo logotipo de EliteNet (lámina de variantes) en encabezado, preloader y favicon.
+- [x] Añadir un preloader de carga con la marca y degradados azules.
