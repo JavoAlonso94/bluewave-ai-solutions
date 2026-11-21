@@ -210,7 +210,40 @@ function Index() {
               <motion.p {...fade} transition={{ ...fade.transition, delay: 0.2 }} className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground lg:mx-0">
                 Chatbots, agentes de voz, WhatsApp, ERP y CRM conectados en un solo ecosistema inteligente.
               </motion.p>
-              <motion.div {...fade} transition={{ ...fade.transition, delay: 0.3 }} className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
+              <motion.div
+                {...fade}
+                transition={{ ...fade.transition, delay: 0.25 }}
+                className="glass relative mx-auto mt-6 flex max-w-xl items-center justify-between gap-5 overflow-hidden rounded-2xl px-5 py-4 text-left shadow-glow lg:mx-0"
+              >
+                <div className="pointer-events-none absolute -right-4 -top-10 h-28 w-28 rounded-full bg-primary/20 blur-2xl" />
+                <p className="relative max-w-sm font-display text-base font-bold leading-snug md:text-lg">
+                  Implementa tu <span className="text-gradient">fuerza desarrollo y crecimiento</span>
+                </p>
+                <svg viewBox="0 0 104 64" className="relative h-14 w-24 shrink-0 overflow-visible text-primary" fill="none" aria-hidden="true">
+                  <path d="M5 57H99M5 42H99M5 27H99" stroke="currentColor" strokeOpacity="0.12" strokeWidth="1" />
+                  <motion.path
+                    d="M7 55L27 39L43 46L68 24L94 8"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: 1 }}
+                    transition={{ duration: 1.4, delay: 0.55, ease: "easeInOut" }}
+                  />
+                  <motion.path
+                    d="M76 8H94V26"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: 1 }}
+                    transition={{ duration: 0.45, delay: 1.75, ease: "easeOut" }}
+                  />
+                </svg>
+              </motion.div>
+              <motion.div {...fade} transition={{ ...fade.transition, delay: 0.35 }} className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
                 <a href="#contacto" className="btn-hero">Agenda una demo <ArrowRight size={18} /></a>
                 <button onClick={() => setChat(true)} className="btn-ghost-glass">Habla con el bot</button>
               </motion.div>
