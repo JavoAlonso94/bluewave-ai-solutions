@@ -403,3 +403,21 @@ html.lenis, html.lenis body { height: auto; }
   .preloader-ring { animation: none; }
   .preloader-bar-fill { animation-duration: .8s; }
 }
+
+/* Permiso de voz de la esfera (SweetAlert2) */
+.sphere-voice-popup {
+  border-radius: 1.75rem !important;
+  border: 1px solid color-mix(in oklab, white 18%, transparent);
+  box-shadow: var(--shadow-glow), 0 30px 80px -30px oklch(0.2 0.1 260 / .6);
+  font-family: var(--font-sans);
+}
+.sphere-voice-popup .swal2-title { font-family: var(--font-display, var(--font-sans)); font-weight: 800; }
+.sphere-voice-popup .swal2-actions { gap: .75rem; }
+.sphere-voice-confirm, .sphere-voice-cancel {
+  padding: .8rem 1.5rem; border-radius: 999px; font-weight: 700; cursor: pointer;
+  transition: transform .2s ease, filter .2s ease;
+}
+.sphere-voice-confirm { background-image: var(--gradient-primary); color: oklch(0.99 0 0); box-shadow: var(--shadow-glow); }
+.sphere-voice-cancel { background: transparent; color: inherit; border: 1px solid color-mix(in oklab, currentColor 30%, transparent); }
+.sphere-voice-confirm:hover, .sphere-voice-cancel:hover { transform: translateY(-1px); filter: brightness(1.08); }
+.sphere-voice-confirm:focus-visible, .sphere-voice-cancel:focus-visible { outline: 2px solid oklch(0.78 0.14 215); outline-offset: 3px; }

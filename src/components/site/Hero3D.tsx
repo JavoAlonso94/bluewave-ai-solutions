@@ -16,6 +16,7 @@ import {
   Vector3,
 } from "three";
 import soraFont from "@/assets/fonts/Sora-Bold.ttf";
+import { playSphereVoice } from "@/lib/sphere-voice";
 
 const growthPoints: [number, number, number][] = [
   [-0.72, -0.68, 0], [-0.43, -0.56, 0], [-0.2, -0.61, 0], [0.18, -0.43, 0], [0.64, -0.34, 0],
@@ -359,33 +360,7 @@ function GrowthMessage({ dark }: { dark: boolean }) {
   );
 }
 
-/**
- * Voz de la esfera: una sola instancia de audio; si ya está sonando, el hover
- * no la reinicia ni la duplica. Los navegadores sólo permiten reproducir audio
- * después de que el visitante interactúa con la página (clic, toque o tecla).
- */
-const SPHERE_VOICE_SRC = "/audio/vozesfera.mp3";
-function useSphereVoice() {
-  const audio = useRef<HTMLAudioElement | null>(null);
-  useEffect(() => {
-    const el = new Audio(SPHERE_VOICE_SRC);
-    el.preload = "auto";
-    audio.current = el;
-    return () => {
-      el.pause();
-      audio.current = null;
-    };
-  }, []);
-  return () => {
-    const el = audio.current;
-    if (!el || !el.paused) return;
-    el.currentTime = 0;
-    void el.play().catch(() => undefined);
-  };
-}
-
 function Core({ dark }: { dark: boolean }) {
-  const playVoice = useSphereVoice();
   const ring = useRef<Mesh>(null);
   const ring2 = useRef<Mesh>(null);
   useFrame((s, d) => {
@@ -404,7 +379,7 @@ function Core({ dark }: { dark: boolean }) {
           onPointerOver={(e) => {
             e.stopPropagation();
             document.body.style.cursor = "pointer";
-            playVoice();
+            playSphereVoice();
           }}
           onPointerOut={() => {
             document.body.style.cursor = "";

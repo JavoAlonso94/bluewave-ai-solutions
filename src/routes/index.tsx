@@ -130,6 +130,14 @@ function Index() {
     setDark(document.documentElement.classList.contains("dark"));
   }, []);
 
+  // Tras el preloader, pide permiso para la voz de la esfera 3D (SweetAlert2).
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void import("@/lib/sphere-voice").then(({ requestSphereVoicePermission }) => requestSphereVoicePermission());
+    }, 2200);
+    return () => window.clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     let frame = 0;
     const updateActiveSection = () => {
