@@ -255,8 +255,49 @@ html.lenis, html.lenis body { height: auto; }
     linear-gradient(115deg, color-mix(in oklab, var(--color-foreground) 7%, transparent), transparent 32%, color-mix(in oklab, var(--primary) 6%, transparent) 72%, transparent),
     radial-gradient(circle at 14% 10%, color-mix(in oklab, var(--color-foreground) 9%, transparent), transparent 38%);
   border-block: 1px solid color-mix(in oklab, var(--color-foreground) 8%, transparent);
-  backdrop-filter: blur(22px) saturate(1.55);
+  backdrop-filter: blur(28px) saturate(1.6);
   box-shadow: inset 0 1px 0 color-mix(in oklab, var(--color-foreground) 10%, transparent);
+}
+
+/* Manchas de color detrás del vidrio: el cristal las difumina y da el efecto glassmorphism */
+.hero-blob {
+  position: absolute; border-radius: 9999px; opacity: .7;
+  animation: hero-blob-drift 18s ease-in-out infinite alternate;
+}
+.hero-blob-a { width: 42vw; height: 42vw; left: -8vw; top: 8%; background: oklch(0.62 0.2 255); }
+.hero-blob-b { width: 34vw; height: 34vw; right: -6vw; top: -10%; background: oklch(0.75 0.15 215); animation-delay: -6s; }
+.hero-blob-c { width: 30vw; height: 30vw; left: 38%; bottom: -12%; background: oklch(0.55 0.22 275 / .8); animation-delay: -12s; }
+.dark .hero-blob { opacity: .38; }
+@keyframes hero-blob-drift {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(4vw, 3vh, 0) scale(1.12); }
+  100% { transform: translate3d(-3vw, -2vh, 0) scale(.94); }
+}
+
+/* Tarjeta de vidrio del texto principal */
+.hero-glass-card {
+  position: relative; isolation: isolate;
+  background: linear-gradient(140deg, color-mix(in oklab, white 34%, transparent), color-mix(in oklab, white 10%, transparent));
+  border: 1px solid color-mix(in oklab, white 55%, transparent);
+  backdrop-filter: blur(18px) saturate(1.5);
+  box-shadow: 0 24px 60px -24px oklch(0.35 0.15 258 / .45), inset 0 1px 0 color-mix(in oklab, white 70%, transparent);
+}
+.dark .hero-glass-card {
+  background: linear-gradient(140deg, color-mix(in oklab, white 9%, transparent), color-mix(in oklab, white 2%, transparent));
+  border-color: color-mix(in oklab, white 14%, transparent);
+  box-shadow: 0 24px 60px -24px oklch(0.05 0.05 258 / .8), inset 0 1px 0 color-mix(in oklab, white 16%, transparent);
+}
+
+/* Disco de vidrio detrás de la esfera 3D */
+.hero-glass-disc {
+  background: radial-gradient(circle at 30% 25%, color-mix(in oklab, white 30%, transparent), color-mix(in oklab, white 6%, transparent) 60%);
+  border: 1px solid color-mix(in oklab, white 40%, transparent);
+  backdrop-filter: blur(10px) saturate(1.4);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, white 55%, transparent), 0 30px 80px -30px oklch(0.4 0.18 255 / .55);
+}
+.dark .hero-glass-disc {
+  background: radial-gradient(circle at 30% 25%, color-mix(in oklab, white 10%, transparent), color-mix(in oklab, white 2%, transparent) 60%);
+  border-color: color-mix(in oklab, white 12%, transparent);
 }
 .hero-glass::before {
   content: ""; position: absolute; inset: -30% -20%;
@@ -328,7 +369,7 @@ html.lenis, html.lenis body { height: auto; }
   opacity: 0 !important; visibility: hidden !important; pointer-events: none !important;
 }
 @media (prefers-reduced-motion: reduce) {
-  .hero-glass::before { animation: none; }
+  .hero-glass::before, .hero-blob { animation: none; }
   .preloader-ring { animation: none; }
   .preloader-bar-fill { animation-duration: .8s; }
 }

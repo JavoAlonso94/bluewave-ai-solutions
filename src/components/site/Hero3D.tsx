@@ -1,8 +1,8 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, Line, MeshDistortMaterial, Sphere, Text, Torus, Icosahedron, Environment, Lightformer } from "@react-three/drei";
+import { Float, Line, MeshDistortMaterial, Sphere, Torus, Icosahedron, Environment, Lightformer } from "@react-three/drei";
 import { useReducedMotion } from "framer-motion";
-import { useRef } from "react";
-import { Group, Mesh } from "three";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { CanvasTexture, Group, LinearFilter, Mesh, SRGBColorSpace } from "three";
 import soraFont from "@/assets/fonts/Sora-Bold.ttf";
 
 const growthPoints: [number, number, number][] = [
@@ -26,8 +26,57 @@ type SolidTextProps = {
   letterSpacing?: number;
 };
 
+const HERO_FONT = "EliteNetHeroSora";
+let fontPromise: Promise<void> | null = null;
+function loadHeroFont() {
+  if (!fontPromise) {
+    fontPromise = new FontFace(HERO_FONT, `url(${soraFont})`, { weight: "700" })
+      .load()
+      .then((face) => { document.fonts.add(face); })
+      .catch(() => undefined);
+  }
+  return fontPromise;
+}
+
+/** Texto dibujado en un canvas 2D y usado como textura: sin workers ni WebGL extra, funciona en cualquier navegador. */
+function useTextTexture(text: string, letterSpacing: number, fontReady: boolean) {
+  const result = useMemo(() => {
+    const px = 160;
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    const font = `700 ${px}px ${fontReady ? HERO_FONT + "," : ""} system-ui, sans-serif`;
+    ctx.font = font;
+    const spacing = letterSpacing * px;
+    const width = Math.ceil(ctx.measureText(text).width + spacing * text.length + px * 0.4);
+    const height = Math.ceil(px * 1.35);
+    canvas.width = width;
+    canvas.height = height;
+    ctx.font = font;
+    if ("letterSpacing" in ctx) (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = `${spacing}px`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(text, width / 2 + spacing / 2, height / 2);
+    const texture = new CanvasTexture(canvas);
+    texture.colorSpace = SRGBColorSpace;
+    texture.minFilter = LinearFilter;
+    texture.generateMipmaps = false;
+    return { texture, aspect: width / height };
+  }, [text, letterSpacing, fontReady]);
+  useEffect(() => () => result?.texture.dispose(), [result]);
+  return result;
+}
+
 function SolidText({ children, position, fontSize, color, depthColor, delay, reduceMotion, letterSpacing = 0 }: SolidTextProps) {
   const group = useRef<Group>(null);
+  const [fontReady, setFontReady] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    loadHeroFont().then(() => { if (alive) setFontReady(true); });
+    return () => { alive = false; };
+  }, []);
+  const tex = useTextTexture(children, letterSpacing, fontReady);
   const baseY = position[1];
   const depth = fontSize * 0.085;
 
@@ -39,46 +88,22 @@ function SolidText({ children, position, fontSize, color, depthColor, delay, red
     group.current.position.y = baseY - (1 - progress) * 0.1;
   });
 
+  if (!tex) return null;
+  const h = fontSize * 1.35;
+  const w = h * tex.aspect;
+
   return (
     <group ref={group} position={position} visible={reduceMotion}>
       {[1.6, 0.8].map((layer) => (
-        <Text
-          key={layer}
-          font={soraFont}
-          fontSize={fontSize}
-          letterSpacing={letterSpacing}
-          anchorX="center"
-          anchorY="middle"
-          textAlign="center"
-          maxWidth={2.05}
-          position={[0, 0, -depth * layer]}
-          renderOrder={3}
-        >
-          {children}
-          <meshBasicMaterial color={depthColor} depthTest={false} depthWrite={false} />
-        </Text>
+        <mesh key={layer} position={[0, 0, -depth * layer]} renderOrder={3}>
+          <planeGeometry args={[w, h]} />
+          <meshBasicMaterial map={tex.texture} color={depthColor} transparent depthTest={false} depthWrite={false} toneMapped={false} />
+        </mesh>
       ))}
-      <Text
-        font={soraFont}
-        fontSize={fontSize}
-        letterSpacing={letterSpacing}
-        anchorX="center"
-        anchorY="middle"
-        textAlign="center"
-        maxWidth={2.05}
-        renderOrder={5}
-      >
-        {children}
-        <meshStandardMaterial
-          color={color}
-          emissive={color}
-          emissiveIntensity={0.24}
-          metalness={0.35}
-          roughness={0.24}
-          depthTest={false}
-          depthWrite={false}
-        />
-      </Text>
+      <mesh renderOrder={5}>
+        <planeGeometry args={[w, h]} />
+        <meshBasicMaterial map={tex.texture} color={color} transparent depthTest={false} depthWrite={false} toneMapped={false} />
+      </mesh>
     </group>
   );
 }

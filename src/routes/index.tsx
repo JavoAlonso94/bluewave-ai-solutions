@@ -68,6 +68,7 @@ function Faq() {
   );
 }
 
+import SafeBoundary from "@/components/site/SafeBoundary";
 const Hero3D = lazy(() => import("@/components/site/Hero3D"));
 const ParticlesBg = lazy(() => import("@/components/site/ParticlesBg"));
 const SmoothScroll = lazy(() => import("@/components/site/SmoothScroll"));
@@ -194,18 +195,24 @@ function Index() {
       {/* HERO */}
       <section id="inicio" className="relative flex min-h-[100svh] items-center pt-20 pb-28 lg:pb-0">
         <div className="hero-blue absolute inset-0" aria-hidden="true" />
-        <div className="absolute inset-0 -z-0">
-          {mounted && <Suspense fallback={null}><ParticlesBg dark={dark} /></Suspense>}
+        <div className="hero-blobs absolute inset-0 overflow-hidden" aria-hidden="true">
+          <span className="hero-blob hero-blob-a" />
+          <span className="hero-blob hero-blob-b" />
+          <span className="hero-blob hero-blob-c" />
         </div>
         <div className="hero-glass absolute inset-0" aria-hidden="true" />
+        <div className="absolute inset-0">
+          {mounted && <SafeBoundary><Suspense fallback={null}><ParticlesBg dark={dark} /></Suspense></SafeBoundary>}
+        </div>
         <div className="container relative">
           <div className="row align-items-center g-5">
             <div className="col-md-6 text-center lg:text-left">
+              <div className="hero-glass-card rounded-[2rem] p-6 md:p-8">
               <motion.span {...fade} className="glass inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold">
                 <Sparkles size={14} className="text-primary" /> Automatización con Inteligencia Artificial
               </motion.span>
               <motion.h1 {...fade} transition={{ ...fade.transition, delay: 0.1 }}
-                className="mt-6 text-4xl font-extrabold leading-[1.05] md:text-6xl">
+                className="mt-6 text-4xl font-extrabold leading-[1.05] md:text-[2.25rem] lg:text-5xl xl:text-6xl">
                 Tu empresa, <span className="text-gradient">automatizada</span> con IA que trabaja por ti
               </motion.h1>
               <motion.p {...fade} transition={{ ...fade.transition, delay: 0.2 }} className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground lg:mx-0">
@@ -215,12 +222,16 @@ function Index() {
                 <a href="#contacto" className="btn-hero">Agenda una demo <ArrowRight size={18} /></a>
                 <button onClick={() => setChat(true)} className="btn-ghost-glass">Habla con el bot</button>
               </motion.div>
+              </div>
             </div>
             <div className="col-md-6">
               <div className="relative mx-auto aspect-square w-full max-w-[520px]">
                 <div className="hero-orb-halo absolute inset-2 rounded-full" />
+                <div className="hero-glass-disc absolute inset-[9%] rounded-full" aria-hidden="true" />
                 <div className="absolute inset-10 rounded-full bg-gradient-primary opacity-30 blur-3xl" />
-                {mounted && <Suspense fallback={null}><Hero3D dark={dark} /></Suspense>}
+                <div className="absolute inset-0" data-hero-3d>
+                  {mounted && <SafeBoundary><Suspense fallback={null}><Hero3D dark={dark} /></Suspense></SafeBoundary>}
+                </div>
                 <p className="sr-only">Implementa tu fuerza desarrollo y crecimiento</p>
               </div>
             </div>
