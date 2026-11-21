@@ -5,7 +5,7 @@
  * visitante, así que pedimos permiso con SweetAlert2: el clic en "Activar
  * sonido" desbloquea el audio (también en Safari) y la elección se guarda.
  */
-const SRC = "/audio/vozesfera.mp3";
+const SRC = "/audio/vozesfera.mp3?v=2"; // cambia "v" al reemplazar el audio para evitar la caché
 const STORAGE_KEY = "sphere-voice";
 
 type Choice = "on" | "off";
