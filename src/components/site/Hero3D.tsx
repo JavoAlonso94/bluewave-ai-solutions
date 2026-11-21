@@ -1,9 +1,28 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, MeshDistortMaterial, Sphere, Torus, Icosahedron, Environment, Lightformer } from "@react-three/drei";
 import { useRef } from "react";
-import type { Mesh } from "three";
+import type { RefObject } from "react";
+import { Group, Mesh, Vector3 } from "three";
 
-function Core() {
+type MessageRef = RefObject<HTMLDivElement | null>;
+
+function MessageAnchor({ messageRef }: { messageRef: MessageRef }) {
+  const anchor = useRef<Group>(null);
+  const projected = useRef(new Vector3());
+
+  useFrame((state) => {
+    if (!anchor.current || !messageRef.current) return;
+    anchor.current.getWorldPosition(projected.current);
+    projected.current.project(state.camera);
+    const x = (projected.current.x * 0.5 + 0.5) * state.size.width;
+    const y = (-projected.current.y * 0.5 + 0.5) * state.size.height;
+    messageRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
+  });
+
+  return <group ref={anchor} position={[0, 0, 1.2]} />;
+}
+
+function Core({ messageRef }: { messageRef: MessageRef }) {
   const ring = useRef<Mesh>(null);
   const ring2 = useRef<Mesh>(null);
   useFrame((s, d) => {
@@ -20,6 +39,7 @@ function Core() {
         <Sphere args={[1.15, 96, 96]}>
           <MeshDistortMaterial color="#2f6bff" distort={0.38} speed={2.2} roughness={0.15} metalness={0.6} />
         </Sphere>
+        <MessageAnchor messageRef={messageRef} />
       </Float>
       <Torus ref={ring} args={[1.9, 0.035, 16, 120]}>
         <meshStandardMaterial color="#7cc4ff" emissive="#3a8bff" emissiveIntensity={0.8} metalness={0.8} roughness={0.2} />
@@ -38,7 +58,7 @@ function Core() {
   );
 }
 
-export default function Hero3D() {
+export default function Hero3D({ messageRef }: { messageRef: MessageRef }) {
   return (
     <Canvas camera={{ position: [0, 0, 6], fov: 45 }} dpr={[1, 1.75]} gl={{ alpha: true, antialias: true }}>
       <ambientLight intensity={0.5} />
@@ -48,7 +68,7 @@ export default function Hero3D() {
         <Lightformer intensity={2} position={[0, 5, 0]} scale={[10, 10, 1]} />
         <Lightformer intensity={1.2} color="#8bc4ff" position={[-5, 1, -1]} rotation-y={Math.PI / 2} scale={[20, 1, 1]} />
       </Environment>
-      <Core />
+      <Core messageRef={messageRef} />
     </Canvas>
   );
 }

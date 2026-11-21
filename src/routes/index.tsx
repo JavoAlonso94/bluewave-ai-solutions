@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
   PhoneCall, Moon, Sun, Home, Layers, Workflow, Mail, ArrowRight, Sparkles,
@@ -124,6 +124,7 @@ function Index() {
   const [dark, setDark] = useState(true);
   const [chat, setChat] = useState(false);
   const [tab, setTab] = useState("inicio");
+  const sphereMessageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -198,6 +199,7 @@ function Index() {
         <div className="absolute inset-0 -z-0">
           {mounted && <Suspense fallback={null}><ParticlesBg dark={dark} /></Suspense>}
         </div>
+        <div className="hero-glass absolute inset-0" aria-hidden="true" />
         <div className="container relative">
           <div className="row align-items-center g-5">
             <div className="col-md-6 text-center lg:text-left">
@@ -220,8 +222,10 @@ function Index() {
               <div className="relative mx-auto aspect-square w-full max-w-[520px]">
                 <div className="hero-orb-halo absolute inset-2 rounded-full" />
                 <div className="absolute inset-10 rounded-full bg-gradient-primary opacity-30 blur-3xl" />
-                {mounted && <Suspense fallback={null}><Hero3D /></Suspense>}
-                <HeroSphereMessage />
+                {mounted && <Suspense fallback={null}><Hero3D messageRef={sphereMessageRef} /></Suspense>}
+                <div ref={sphereMessageRef} className="sphere-message-anchor pointer-events-none absolute left-0 top-0 z-10">
+                  <HeroSphereMessage />
+                </div>
               </div>
             </div>
           </div>

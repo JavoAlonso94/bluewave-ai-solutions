@@ -11,3 +11,4 @@
 - [x] Integrar el nuevo logotipo de EliteNet (lámina de variantes) en encabezado, preloader y favicon.
 - [x] Añadir un preloader de carga con la marca y degradados azules.
 - [x] Animar «Implementa tu fuerza desarrollo y crecimiento» dentro de la esfera 3D con cristal y flecha de crecimiento.
+- [x] Extender el cristal a todo el hero y sincronizar texto y flecha con el movimiento del modelo 3D.
