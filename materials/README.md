@@ -17,6 +17,8 @@ Todos los archivos multimedia utilizados por EliteNet están incluidos directame
 | `src/assets/voice-ai.jpg` | Agentes de voz con IA | Casos y servicios |
 | `src/assets/videos/batorgym-chatbot-whatsapp.mp4` | Video H.264/AAC, 1920 × 1080, 21 segundos | Demostración cinematográfica |
 | `src/assets/videos/batorgym-chatbot-poster.jpg` | Portada del video, 1920 × 1080 | Vista previa del reproductor |
+| `src/assets/fonts/Sora-Bold.ttf` | Tipografía Sora Bold | Texto renderizado dentro de la escena 3D |
+| `src/assets/fonts/OFL.txt` | Licencia abierta de Sora | Distribución de la tipografía |
 | `public/favicon.png` | Icono del sitio | Pestaña del navegador |
 
 ## Materiales fuente

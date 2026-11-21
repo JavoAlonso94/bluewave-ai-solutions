@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   PhoneCall, Moon, Sun, Home, Layers, Workflow, Mail, ArrowRight, Sparkles,
@@ -15,7 +15,6 @@ import { motion as m2, useScroll, useSpring, AnimatePresence } from "framer-moti
 import { ChevronDown, Star, CheckCircle2 } from "lucide-react";
 import logoLight from "@/assets/elitnet-logo-day.png";
 import logoDark from "@/assets/elitnet-logo-night.png";
-import { HeroSphereMessage } from "@/components/site/HeroSphereMessage";
 import teamImg from "@/assets/team-ai.jpg";
 import serversImg from "@/assets/ai-servers.jpg";
 import waImg from "@/assets/whatsapp-ai.jpg";
@@ -124,7 +123,6 @@ function Index() {
   const [dark, setDark] = useState(true);
   const [chat, setChat] = useState(false);
   const [tab, setTab] = useState("inicio");
-  const sphereMessageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -222,10 +220,8 @@ function Index() {
               <div className="relative mx-auto aspect-square w-full max-w-[520px]">
                 <div className="hero-orb-halo absolute inset-2 rounded-full" />
                 <div className="absolute inset-10 rounded-full bg-gradient-primary opacity-30 blur-3xl" />
-                {mounted && <Suspense fallback={null}><Hero3D messageRef={sphereMessageRef} /></Suspense>}
-                <div ref={sphereMessageRef} className="sphere-message-anchor pointer-events-none absolute left-0 top-0 z-10">
-                  <HeroSphereMessage />
-                </div>
+                {mounted && <Suspense fallback={null}><Hero3D dark={dark} /></Suspense>}
+                <p className="sr-only">Implementa tu fuerza desarrollo y crecimiento</p>
               </div>
             </div>
           </div>

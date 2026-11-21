@@ -1,28 +1,133 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, MeshDistortMaterial, Sphere, Torus, Icosahedron, Environment, Lightformer } from "@react-three/drei";
+import { Float, Line, MeshDistortMaterial, Sphere, Text, Torus, Icosahedron, Environment, Lightformer } from "@react-three/drei";
+import { useReducedMotion } from "framer-motion";
 import { useRef } from "react";
-import type { RefObject } from "react";
-import { Group, Mesh, Vector3 } from "three";
+import { Group, Mesh } from "three";
+import soraFont from "@/assets/fonts/Sora-Bold.ttf";
 
-type MessageRef = RefObject<HTMLDivElement | null>;
+const growthPoints: [number, number, number][] = [
+  [-0.72, -0.68, 0], [-0.43, -0.56, 0], [-0.2, -0.61, 0], [0.18, -0.43, 0], [0.64, -0.34, 0],
+];
 
-function MessageAnchor({ messageRef }: { messageRef: MessageRef }) {
-  const anchor = useRef<Group>(null);
-  const projected = useRef(new Vector3());
-
-  useFrame((state) => {
-    if (!anchor.current || !messageRef.current) return;
-    anchor.current.getWorldPosition(projected.current);
-    projected.current.project(state.camera);
-    const x = (projected.current.x * 0.5 + 0.5) * state.size.width;
-    const y = (-projected.current.y * 0.5 + 0.5) * state.size.height;
-    messageRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
-  });
-
-  return <group ref={anchor} position={[0, 0, 1.2]} />;
+function entranceProgress(elapsed: number, delay: number, reduceMotion: boolean) {
+  if (reduceMotion) return 1;
+  const progress = Math.min(1, Math.max(0, (elapsed - 1.4 - delay) / 0.75));
+  return 1 - Math.pow(1 - progress, 3);
 }
 
-function Core({ messageRef }: { messageRef: MessageRef }) {
+type SolidTextProps = {
+  children: string;
+  position: [number, number, number];
+  fontSize: number;
+  color: string;
+  depthColor: string;
+  delay: number;
+  reduceMotion: boolean;
+  letterSpacing?: number;
+};
+
+function SolidText({ children, position, fontSize, color, depthColor, delay, reduceMotion, letterSpacing = 0 }: SolidTextProps) {
+  const group = useRef<Group>(null);
+  const baseY = position[1];
+  const depth = fontSize * 0.085;
+
+  useFrame(({ clock }) => {
+    if (!group.current) return;
+    const progress = entranceProgress(clock.elapsedTime, delay, reduceMotion);
+    group.current.visible = progress > 0;
+    group.current.scale.setScalar(0.86 + progress * 0.14);
+    group.current.position.y = baseY - (1 - progress) * 0.1;
+  });
+
+  return (
+    <group ref={group} position={position} visible={reduceMotion}>
+      {[1.6, 0.8].map((layer) => (
+        <Text
+          key={layer}
+          font={soraFont}
+          fontSize={fontSize}
+          letterSpacing={letterSpacing}
+          anchorX="center"
+          anchorY="middle"
+          textAlign="center"
+          maxWidth={2.05}
+          position={[0, 0, -depth * layer]}
+          renderOrder={3}
+        >
+          {children}
+          <meshBasicMaterial color={depthColor} depthTest={false} depthWrite={false} />
+        </Text>
+      ))}
+      <Text
+        font={soraFont}
+        fontSize={fontSize}
+        letterSpacing={letterSpacing}
+        anchorX="center"
+        anchorY="middle"
+        textAlign="center"
+        maxWidth={2.05}
+        renderOrder={5}
+      >
+        {children}
+        <meshStandardMaterial
+          color={color}
+          emissive={color}
+          emissiveIntensity={0.24}
+          metalness={0.35}
+          roughness={0.24}
+          depthTest={false}
+          depthWrite={false}
+        />
+      </Text>
+    </group>
+  );
+}
+
+function GrowthMessage({ dark }: { dark: boolean }) {
+  const reduceMotion = Boolean(useReducedMotion());
+  const arrow = useRef<Group>(null);
+  const tip = useRef<Mesh>(null);
+  const ink = "#f3f8ff";
+  const accent = dark ? "#63e6ff" : "#9deeff";
+  const depth = dark ? "#073a8c" : "#07539a";
+
+  useFrame(({ clock }) => {
+    if (!arrow.current) return;
+    const progress = entranceProgress(clock.elapsedTime, 0.85, reduceMotion);
+    arrow.current.visible = progress > 0;
+    arrow.current.scale.setScalar(0.72 + progress * 0.28);
+    if (tip.current) tip.current.scale.setScalar(reduceMotion ? 1 : 1 + Math.sin(clock.elapsedTime * 3) * 0.12);
+  });
+
+  return (
+    <group position={[0, 0, 1.42]}>
+      <SolidText position={[0, 0.59, 0]} fontSize={0.075} letterSpacing={0.2} color={accent} depthColor={depth} delay={0} reduceMotion={reduceMotion}>
+        IMPULSO CON IA
+      </SolidText>
+      <SolidText position={[0, 0.32, 0]} fontSize={0.165} color={ink} depthColor={depth} delay={0.1} reduceMotion={reduceMotion}>
+        Implementa tu fuerza
+      </SolidText>
+      <SolidText position={[0, 0.03, 0]} fontSize={0.29} color={accent} depthColor={depth} delay={0.22} reduceMotion={reduceMotion}>
+        desarrollo
+      </SolidText>
+      <SolidText position={[0, -0.28, 0]} fontSize={0.255} color={accent} depthColor={depth} delay={0.34} reduceMotion={reduceMotion}>
+        y crecimiento
+      </SolidText>
+
+      <group ref={arrow} visible={reduceMotion}>
+        <Line points={[[-0.78, -0.79, -0.01], [0.74, -0.79, -0.01]]} color={accent} lineWidth={1} transparent opacity={0.24} depthTest={false} />
+        <Line points={growthPoints} color={accent} lineWidth={2.6} renderOrder={5} depthTest={false} />
+        <Line points={[[0.43, -0.34, 0], [0.64, -0.34, 0], [0.61, -0.55, 0]]} color={accent} lineWidth={2.6} renderOrder={5} depthTest={false} />
+        <mesh ref={tip} position={[0.64, -0.34, 0]} renderOrder={5}>
+          <sphereGeometry args={[0.035, 20, 20]} />
+          <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={1.2} depthTest={false} depthWrite={false} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+function Core({ dark }: { dark: boolean }) {
   const ring = useRef<Mesh>(null);
   const ring2 = useRef<Mesh>(null);
   useFrame((s, d) => {
@@ -35,11 +140,11 @@ function Core({ messageRef }: { messageRef: MessageRef }) {
   });
   return (
     <>
-      <Float speed={2} rotationIntensity={0.6} floatIntensity={1.2}>
+      <Float speed={1.8} rotationIntensity={0.32} floatIntensity={0.9}>
         <Sphere args={[1.15, 96, 96]}>
           <MeshDistortMaterial color="#2f6bff" distort={0.38} speed={2.2} roughness={0.15} metalness={0.6} />
         </Sphere>
-        <MessageAnchor messageRef={messageRef} />
+        <GrowthMessage dark={dark} />
       </Float>
       <Torus ref={ring} args={[1.9, 0.035, 16, 120]}>
         <meshStandardMaterial color="#7cc4ff" emissive="#3a8bff" emissiveIntensity={0.8} metalness={0.8} roughness={0.2} />
@@ -58,9 +163,15 @@ function Core({ messageRef }: { messageRef: MessageRef }) {
   );
 }
 
-export default function Hero3D({ messageRef }: { messageRef: MessageRef }) {
+export default function Hero3D({ dark }: { dark: boolean }) {
   return (
-    <Canvas camera={{ position: [0, 0, 6], fov: 45 }} dpr={[1, 1.75]} gl={{ alpha: true, antialias: true }}>
+    <Canvas
+      camera={{ position: [0, 0, 6], fov: 45 }}
+      dpr={[1, 1.75]}
+      gl={{ alpha: true, antialias: true }}
+      role="img"
+      aria-label="Esfera 3D con el mensaje Implementa tu fuerza desarrollo y crecimiento"
+    >
       <ambientLight intensity={0.5} />
       <directionalLight position={[4, 5, 3]} intensity={1.4} />
       <pointLight position={[-4, -2, 2]} intensity={20} color="#6fc3ff" />
@@ -68,7 +179,7 @@ export default function Hero3D({ messageRef }: { messageRef: MessageRef }) {
         <Lightformer intensity={2} position={[0, 5, 0]} scale={[10, 10, 1]} />
         <Lightformer intensity={1.2} color="#8bc4ff" position={[-5, 1, -1]} rotation-y={Math.PI / 2} scale={[20, 1, 1]} />
       </Environment>
-      <Core messageRef={messageRef} />
+      <Core dark={dark} />
     </Canvas>
   );
 }

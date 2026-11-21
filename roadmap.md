@@ -12,3 +12,4 @@
 - [x] Añadir un preloader de carga con la marca y degradados azules.
 - [x] Animar «Implementa tu fuerza desarrollo y crecimiento» dentro de la esfera 3D con cristal y flecha de crecimiento.
 - [x] Extender el cristal a todo el hero y sincronizar texto y flecha con el movimiento del modelo 3D.
+- [x] Sustituir el recuadro HTML por texto y flecha 3D reales, dejando el vidrio únicamente en el fondo del hero.
