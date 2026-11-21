@@ -13,14 +13,14 @@ import { ServiceExplorer } from "@/components/site/ServiceExplorer";
 import { ProcessJourney } from "@/components/site/ProcessJourney";
 import { motion as m2, useScroll, useSpring, AnimatePresence } from "framer-motion";
 import { ChevronDown, Star, CheckCircle2 } from "lucide-react";
-import logoLight from "@/assets/iec-logo-light.png.asset.json";
-import logoDark from "@/assets/iec-logo-dark.png.asset.json";
+import logoLight from "@/assets/iec-logo-light.png";
+import logoDark from "@/assets/iec-logo-dark.png";
 import teamImg from "@/assets/team-ai.jpg";
 import serversImg from "@/assets/ai-servers.jpg";
 import waImg from "@/assets/whatsapp-ai.jpg";
 import voiceImg from "@/assets/voice-ai.jpg";
-import gymVideo from "@/assets/videos/batorgym-chatbot-whatsapp.mp4.asset.json";
-import gymPoster from "@/assets/videos/batorgym-chatbot-poster.jpg.asset.json";
+import gymVideo from "@/assets/videos/batorgym-chatbot-whatsapp.mp4";
+import gymPoster from "@/assets/videos/batorgym-chatbot-poster.jpg";
 
 const showcase = [
   { img: serversImg, tag: "Infraestructura", t: "Servidores de IA privados", d: "Modelos propios en tu nube, con datos 100% bajo tu control." },
@@ -167,7 +167,7 @@ function Index() {
       <header className="glass fixed inset-x-0 top-0 z-40 md:inset-x-4 md:top-4 md:rounded-full">
         <div className="container flex h-16 items-center justify-between px-4 md:px-6">
           <a href="#inicio" className="flex items-center gap-2">
-            <img src={logoLight.url} alt="IEC IA" width={44} height={34} className="h-11 w-auto dark:hidden" /><img src={logoDark.url} alt="IEC IA" width={44} height={34} className="hidden h-11 w-auto dark:block" />
+            <img src={logoLight} alt="IEC IA" width={44} height={34} className="h-11 w-auto dark:hidden" /><img src={logoDark} alt="IEC IA" width={44} height={34} className="hidden h-11 w-auto dark:block" />
             <span className="font-display text-lg font-bold">IEC <span className="text-gradient">IA</span></span>
           </a>
           <nav className="hidden items-center gap-5 text-xs font-semibold lg:flex xl:gap-7 xl:text-sm" aria-label="Navegación principal">
@@ -255,7 +255,7 @@ function Index() {
       <N8NFlowBuilder />
 
       {/* Cinematic video demo */}
-      <VideoShowcase src={gymVideo.url} poster={gymPoster.url} />
+      <VideoShowcase src={gymVideo} poster={gymPoster} />
 
       {/* Showcase */}
       <section className="container py-16">
