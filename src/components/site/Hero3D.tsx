@@ -359,7 +359,33 @@ function GrowthMessage({ dark }: { dark: boolean }) {
   );
 }
 
+/**
+ * Voz de la esfera: una sola instancia de audio; si ya está sonando, el hover
+ * no la reinicia ni la duplica. Los navegadores sólo permiten reproducir audio
+ * después de que el visitante interactúa con la página (clic, toque o tecla).
+ */
+const SPHERE_VOICE_SRC = "/audio/vozesfera.mp3";
+function useSphereVoice() {
+  const audio = useRef<HTMLAudioElement | null>(null);
+  useEffect(() => {
+    const el = new Audio(SPHERE_VOICE_SRC);
+    el.preload = "auto";
+    audio.current = el;
+    return () => {
+      el.pause();
+      audio.current = null;
+    };
+  }, []);
+  return () => {
+    const el = audio.current;
+    if (!el || !el.paused) return;
+    el.currentTime = 0;
+    void el.play().catch(() => undefined);
+  };
+}
+
 function Core({ dark }: { dark: boolean }) {
+  const playVoice = useSphereVoice();
   const ring = useRef<Mesh>(null);
   const ring2 = useRef<Mesh>(null);
   useFrame((s, d) => {
@@ -373,7 +399,17 @@ function Core({ dark }: { dark: boolean }) {
   return (
     <>
       <Float speed={1.8} rotationIntensity={0.32} floatIntensity={0.9}>
-        <Sphere args={[1.15, 96, 96]}>
+        <Sphere
+          args={[1.15, 96, 96]}
+          onPointerOver={(e) => {
+            e.stopPropagation();
+            document.body.style.cursor = "pointer";
+            playVoice();
+          }}
+          onPointerOut={() => {
+            document.body.style.cursor = "";
+          }}
+        >
           <MeshDistortMaterial color="#2f6bff" distort={0.38} speed={2.2} roughness={0.15} metalness={0.6} />
         </Sphere>
         <GrowthMessage dark={dark} />
