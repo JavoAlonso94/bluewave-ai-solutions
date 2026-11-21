@@ -2,7 +2,19 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, Line, MeshDistortMaterial, Sphere, Torus, Icosahedron, Environment, Lightformer } from "@react-three/drei";
 import { useReducedMotion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CanvasTexture, Group, LinearFilter, MathUtils, Mesh, SRGBColorSpace, Vector3 } from "three";
+import {
+  CanvasTexture,
+  CylinderGeometry,
+  FrontSide,
+  Group,
+  LinearFilter,
+  MathUtils,
+  Mesh,
+  MeshBasicMaterial,
+  RepeatWrapping,
+  SRGBColorSpace,
+  Vector3,
+} from "three";
 import soraFont from "@/assets/fonts/Sora-Bold.ttf";
 
 const growthPoints: [number, number, number][] = [
@@ -15,9 +27,12 @@ function entranceProgress(elapsed: number, delay: number, reduceMotion: boolean)
   return 1 - Math.pow(1 - progress, 3);
 }
 
-type SolidTextProps = {
+type CurvedTextProps = {
   children: string;
-  position: [number, number, number];
+  /** Altura de la banda respecto al centro de la esfera. */
+  y: number;
+  /** Radio de la banda: siempre mayor que la esfera deformada (~1.32). */
+  radius: number;
   fontSize: number;
   color: string;
   depthColor: string;
@@ -70,31 +85,73 @@ function useTextTexture(text: string, letterSpacing: number, fontReady: boolean)
   return result;
 }
 
-function SolidText({ children, position, fontSize, color, depthColor, delay, reduceMotion, letterSpacing = 0, lag = 0 }: SolidTextProps) {
-  const group = useRef<Group>(null);
-  const layers = useRef<(Mesh | null)[]>([]);
-  const worldPos = useMemo(() => new Vector3(), []);
-  const localPos = useMemo(() => new Vector3(), []);
-  const lagged = useRef<Vector3 | null>(null);
+function useHeroFontReady() {
   const [fontReady, setFontReady] = useState(false);
   useEffect(() => {
     let alive = true;
-    loadHeroFont().then(() => { if (alive) setFontReady(true); });
-    return () => { alive = false; };
+    loadHeroFont().then(() => {
+      if (alive) setFontReady(true);
+    });
+    return () => {
+      alive = false;
+    };
   }, []);
-  const tex = useTextTexture(children, letterSpacing, fontReady);
-  const baseY = position[1];
-  const depth = fontSize * 0.085;
+  return fontReady;
+}
 
-  useFrame(({ clock, camera }, delta) => {
+/**
+ * Texto curvado sobre un cilindro que envuelve la esfera. La esfera tapa lo que
+ * queda detrás (depthTest) y las capas interiores dan grosor de extrusión.
+ */
+function CurvedText({
+  children,
+  y,
+  radius,
+  fontSize,
+  color,
+  depthColor,
+  delay,
+  reduceMotion,
+  letterSpacing = 0,
+  lag = 0,
+}: CurvedTextProps) {
+  const group = useRef<Group>(null);
+  const materials = useRef<(MeshBasicMaterial | null)[]>([]);
+  const worldPos = useMemo(() => new Vector3(), []);
+  const localPos = useMemo(() => new Vector3(), []);
+  const lagged = useRef<Vector3 | null>(null);
+  const fontReady = useHeroFontReady();
+  const tex = useTextTexture(children, letterSpacing, fontReady);
+
+  const h = fontSize * 1.35;
+  const thickness = fontSize * 0.07;
+  const arc = tex ? (h * tex.aspect) / radius : 0;
+  const layers = useMemo(
+    () => [
+      { r: radius - thickness * 2, dy: -thickness * 1.2, tint: depthColor, order: 3 },
+      { r: radius - thickness, dy: -thickness * 0.6, tint: depthColor, order: 4 },
+      { r: radius, dy: 0, tint: color, order: 5 },
+    ],
+    [radius, thickness, depthColor, color],
+  );
+  const geometries = useMemo(
+    () => (arc ? layers.map((l) => new CylinderGeometry(l.r, l.r, h, 128, 1, true, -arc / 2, arc)) : []),
+    [layers, h, arc],
+  );
+  useEffect(() => () => geometries.forEach((g) => g.dispose()), [geometries]);
+
+  useFrame(({ clock }, delta) => {
     const g = group.current;
     if (!g) return;
     const t = clock.elapsedTime;
     const progress = entranceProgress(t, delay, reduceMotion);
     g.visible = progress > 0;
-    g.scale.setScalar(0.86 + progress * 0.14);
+    materials.current.forEach((m) => {
+      if (m) m.opacity = progress;
+    });
 
-    let ox = 0;
+    let sway = 0;
+    let tilt = 0;
     let oy = 0;
     const parent = g.parent;
     if (!reduceMotion && parent) {
@@ -106,42 +163,103 @@ function SolidText({ children, position, fontSize, color, depthColor, delay, red
       localPos.copy(lagged.current);
       parent.worldToLocal(localPos);
       const amount = 1.4 + lag * 2.2;
-      ox = MathUtils.clamp(localPos.x * amount, -0.09, 0.09);
+      const ox = MathUtils.clamp(localPos.x * amount, -0.09, 0.09);
       oy = MathUtils.clamp(localPos.y * amount, -0.09, 0.09);
-      // Ola suave escalonada, sincronizada con el ritmo de flotación.
-      const phase = t * 1.8 - lag * 2.4;
-      oy += Math.sin(phase) * 0.012 * progress;
-      g.rotation.set(-oy * 1.6, ox * 2.2, -ox * 1.2 + Math.sin(phase * 0.7) * 0.02 * progress);
-      // Profundidad: las capas traseras se desplazan contra la cámara.
-      layers.current.forEach((m, i) => {
-        if (!m) return;
-        const k = depth * (i === 0 ? 1.6 : 0.8) * 1.8;
-        m.position.x = -camera.position.x * k - ox * 0.25;
-        m.position.y = -camera.position.y * k - oy * 0.25;
-      });
-    } else {
-      g.rotation.set(0, 0, 0);
+      // Oscilación orbital escalonada: el texto gira un poco alrededor de la esfera.
+      const phase = t * 0.9 - lag * 1.6;
+      sway = ox * 1.8 + Math.sin(phase) * 0.09 * progress;
+      tilt = -oy * 1.1;
     }
-    g.position.x = position[0] + ox;
-    g.position.y = baseY + oy - (1 - progress) * 0.1;
+    // Entrada: cada línea llega girando alrededor de la esfera desde la izquierda.
+    g.rotation.y = sway - (1 - progress) * 1.4;
+    g.rotation.x = tilt;
+    g.position.y = y + oy * 0.5 - (1 - progress) * 0.08;
   });
 
-  if (!tex) return null;
-  const h = fontSize * 1.35;
-  const w = h * tex.aspect;
-
+  if (!tex || geometries.length === 0) return null;
   return (
-    <group ref={group} position={position} visible={reduceMotion}>
-      {[1.6, 0.8].map((layer, i) => (
-        <mesh key={layer} ref={(m) => { layers.current[i] = m; }} position={[0, 0, -depth * layer]} renderOrder={3}>
-          <planeGeometry args={[w, h]} />
-          <meshBasicMaterial map={tex.texture} color={depthColor} transparent depthTest={false} depthWrite={false} toneMapped={false} />
+    <group ref={group} position={[0, y, 0]} visible={reduceMotion}>
+      {layers.map((l, i) => (
+        <mesh key={i} geometry={geometries[i]!} position={[0, l.dy, 0]} renderOrder={l.order}>
+          <meshBasicMaterial
+            ref={(m) => {
+              materials.current[i] = m;
+            }}
+            map={tex.texture}
+            color={l.tint}
+            side={FrontSide}
+            transparent
+            opacity={reduceMotion ? 1 : 0}
+            depthWrite={false}
+            toneMapped={false}
+          />
         </mesh>
       ))}
-      <mesh renderOrder={5}>
-        <planeGeometry args={[w, h]} />
-        <meshBasicMaterial map={tex.texture} color={color} transparent depthTest={false} depthWrite={false} toneMapped={false} />
-      </mesh>
+    </group>
+  );
+}
+
+/** Anillo de texto que orbita la esfera de forma continua. */
+function OrbitText({
+  children,
+  radius,
+  fontSize,
+  color,
+  rotation,
+  y,
+  speed,
+  delay,
+  reduceMotion,
+}: {
+  children: string;
+  radius: number;
+  fontSize: number;
+  color: string;
+  rotation: [number, number, number];
+  y: number;
+  speed: number;
+  delay: number;
+  reduceMotion: boolean;
+}) {
+  const spin = useRef<Group>(null);
+  const material = useRef<MeshBasicMaterial>(null);
+  const fontReady = useHeroFontReady();
+  const tex = useTextTexture(`${children}   •   `, 0.22, fontReady);
+  const h = fontSize * 1.35;
+
+  const geometry = useMemo(() => {
+    if (!tex) return null;
+    const repeats = Math.max(1, Math.round((Math.PI * 2 * radius) / (h * tex.aspect)));
+    tex.texture.wrapS = RepeatWrapping;
+    tex.texture.repeat.set(repeats, 1);
+    tex.texture.needsUpdate = true;
+    return new CylinderGeometry(radius, radius, h, 192, 1, true);
+  }, [tex, radius, h]);
+  useEffect(() => () => geometry?.dispose(), [geometry]);
+
+  useFrame(({ clock }, delta) => {
+    const progress = entranceProgress(clock.elapsedTime, delay, reduceMotion);
+    if (material.current) material.current.opacity = progress * 0.95;
+    if (spin.current && !reduceMotion) spin.current.rotation.y += Math.min(delta, 0.05) * speed;
+  });
+
+  if (!tex || !geometry) return null;
+  return (
+    <group position={[0, y, 0]} rotation={rotation}>
+      <group ref={spin}>
+        <mesh geometry={geometry} renderOrder={6}>
+          <meshBasicMaterial
+            ref={material}
+            map={tex.texture}
+            color={color}
+            side={FrontSide}
+            transparent
+            opacity={reduceMotion ? 0.95 : 0}
+            depthWrite={false}
+            toneMapped={false}
+          />
+        </mesh>
+      </group>
     </group>
   );
 }
@@ -163,21 +281,60 @@ function GrowthMessage({ dark }: { dark: boolean }) {
   });
 
   return (
-    <group position={[0, 0, 1.42]}>
-      <SolidText position={[0, 0.59, 0]} fontSize={0.075} letterSpacing={0.2} color={accent} depthColor={depth} delay={0} lag={0} reduceMotion={reduceMotion}>
-        IMPULSO CON IA
-      </SolidText>
-      <SolidText position={[0, 0.32, 0]} fontSize={0.165} color={ink} depthColor={depth} delay={0.1} lag={0.33} reduceMotion={reduceMotion}>
-        Implementa tu fuerza
-      </SolidText>
-      <SolidText position={[0, 0.03, 0]} fontSize={0.29} color={accent} depthColor={depth} delay={0.22} lag={0.66} reduceMotion={reduceMotion}>
-        desarrollo
-      </SolidText>
-      <SolidText position={[0, -0.28, 0]} fontSize={0.255} color={accent} depthColor={depth} delay={0.34} lag={1} reduceMotion={reduceMotion}>
-        y crecimiento
-      </SolidText>
+    <>
+      {/* Bandas de texto que envuelven la esfera, ligeramente inclinadas como un planeta. */}
+      <group rotation={[0.08, 0, -0.06]}>
+        <OrbitText
+          radius={1.4}
+          y={0.8}
+          rotation={[0.1, 0, -0.05]}
+          fontSize={0.07}
+          color={accent}
+          speed={0.32}
+          delay={0}
+          reduceMotion={reduceMotion}
+        >
+          IMPULSO CON IA
+        </OrbitText>
+        <CurvedText
+          y={0.4}
+          radius={1.48}
+          fontSize={0.16}
+          color={ink}
+          depthColor={depth}
+          delay={0.1}
+          lag={0.33}
+          reduceMotion={reduceMotion}
+        >
+          Implementa tu fuerza
+        </CurvedText>
+        <CurvedText
+          y={0.08}
+          radius={1.52}
+          fontSize={0.28}
+          color={accent}
+          depthColor={depth}
+          delay={0.22}
+          lag={0.66}
+          reduceMotion={reduceMotion}
+        >
+          desarrollo
+        </CurvedText>
+        <CurvedText
+          y={-0.27}
+          radius={1.5}
+          fontSize={0.245}
+          color={accent}
+          depthColor={depth}
+          delay={0.34}
+          lag={1}
+          reduceMotion={reduceMotion}
+        >
+          y crecimiento
+        </CurvedText>
+      </group>
 
-      <group ref={arrow} visible={reduceMotion}>
+      <group ref={arrow} position={[0, -0.15, 1.42]} visible={reduceMotion}>
         <Line points={[[-0.78, -0.79, -0.01], [0.74, -0.79, -0.01]]} color={accent} lineWidth={1} transparent opacity={0.24} depthTest={false} />
         <Line points={growthPoints} color={accent} lineWidth={2.6} renderOrder={5} depthTest={false} />
         <Line points={[[0.43, -0.34, 0], [0.64, -0.34, 0], [0.61, -0.55, 0]]} color={accent} lineWidth={2.6} renderOrder={5} depthTest={false} />
@@ -186,7 +343,7 @@ function GrowthMessage({ dark }: { dark: boolean }) {
           <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={1.2} depthTest={false} depthWrite={false} />
         </mesh>
       </group>
-    </group>
+    </>
   );
 }
 
@@ -210,10 +367,10 @@ function Core({ dark }: { dark: boolean }) {
         <GrowthMessage dark={dark} />
       </Float>
       <Torus ref={ring} args={[1.9, 0.035, 16, 120]}>
-        <meshStandardMaterial color="#7cc4ff" emissive="#3a8bff" emissiveIntensity={0.8} metalness={0.8} roughness={0.2} />
+        <meshStandardMaterial color="#7cc4ff" emissive="#3a8bff" emissiveIntensity={0.8} metalness={0.8} roughness={0.2} depthWrite={false} />
       </Torus>
       <Torus ref={ring2} args={[2.35, 0.02, 16, 120]} rotation={[1.2, 0, 0]}>
-        <meshStandardMaterial color="#a9d8ff" emissive="#5aa9ff" emissiveIntensity={0.6} />
+        <meshStandardMaterial color="#a9d8ff" emissive="#5aa9ff" emissiveIntensity={0.6} depthWrite={false} />
       </Torus>
       {[[-1.85, 1.15, -0.5], [1.95, -0.95, 0.3], [1.5, 1.45, -1]].map((p, i) => (
         <Float key={i} speed={3 + i} floatIntensity={2}>
